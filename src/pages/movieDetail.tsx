@@ -29,7 +29,7 @@ const MovieDetail = () => {
   useEffect(() => {
     if (id) {
       axios
-        .get(`http://192.168.100.4:3000/movie/${id}`)
+        .get(`http://localhost:3000/movie/${id}`)
         .then((res) => setMovie(res.data))
         .catch((err) => console.error(err));
     }
