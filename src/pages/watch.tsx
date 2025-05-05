@@ -31,7 +31,7 @@ const Watch = () => {
   useEffect(() => {
     if (id) {
       axios
-        .get(`http://localhost:3000/movie/${id}`)
+        .get(`http://192.168.100.4:3000/movie/${id}`)
         .then((res) => setMovie(res.data))
         .catch((err) => console.error(err));
     }
@@ -40,7 +40,7 @@ const Watch = () => {
   useEffect(() => {
     if (id && episode) {
       axios
-        .get(`http://localhost:3000/movie/${id}/${episode}`)
+        .get(`http://192.168.100.4:3000/movie/${id}/${episode}`)
         .then((res) => setEpisodeData(res.data))
         .catch((err) => console.error(err));
     }
