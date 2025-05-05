@@ -80,14 +80,14 @@ const Watch = () => {
       <div className="mt-6">
         <h2 className="text-lg font-semibold mb-2">Episodes</h2>
         <ul className="space-y-1">
-        {Array.isArray(movie?.episodes) &&
+        {movie && Array.isArray(movie.episodes) &&
           movie.episodes.map((ep) => {
             const isCurrent = ep.id.toString() === episode;
 
             return (
               <li key={ep.id}>
                 {isCurrent ? (
-                  <span className="text-md font-bold text-gray-500 cursor-default ">
+                  <span className="text-md font-bold text-gray-500 cursor-default">
                     ▶️ {ep.title}
                   </span>
                 ) : (
@@ -101,6 +101,7 @@ const Watch = () => {
               </li>
             );
           })}
+
         </ul>
       </div>
     </div>

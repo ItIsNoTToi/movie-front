@@ -48,8 +48,7 @@ const MovieDetail = () => {
       <div className="mt-6">
         <h2 className="text-lg font-semibold">Episodes:</h2>
         <ul className="list-disc pl-6">
-        {Array.isArray(movie?.episodes) &&
-          movie.episodes.map((episode) => (
+        {movie && Array.isArray(movie?.episodes) && movie.episodes.map((episode) => (
             <li key={episode.id}>
               <Link to={`/movie/${movie.id}/${episode.id}`} className="text-md font-bold" >
                 {episode.title}
