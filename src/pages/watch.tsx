@@ -31,7 +31,7 @@ const Watch = () => {
   useEffect(() => {
     if (id) {
       axios
-        .get(`https://restful-api-vercel-ol4o.vercel.app/movie/1`)
+        .get(`https://restful-api-vercel-ol4o.vercel.app/movie/?id=${id}`)
         .then((res) => setMovie(res.data))
         .catch((err) => console.error(err));
     }
@@ -40,7 +40,7 @@ const Watch = () => {
   useEffect(() => {
     if (id && episode) {
       axios
-        .get(`https://restful-api-vercel-ol4o.vercel.app/episode/${episode}`)
+        .get(`https://restful-api-vercel-ol4o.vercel.app/episode/?MovieId=${id}&id=${episode}`)
         .then((res) => setEpisodeData(res.data))
         .catch((err) => console.error(err));
     }

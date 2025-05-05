@@ -29,7 +29,7 @@ const MovieDetail = () => {
   useEffect(() => {
     if (id) {
       axios
-        .get(`https://restful-api-vercel-ol4o.vercel.app/movie/1`)
+        .get(`https://restful-api-vercel-ol4o.vercel.app/movie/?id=${id}`)
         .then((res) => setMovie(res.data))
         .catch((err) => console.error(err));
     }
