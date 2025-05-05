@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { listenerCount } from "process";
 
 type EpisodeType = {
   id: number;
@@ -24,6 +25,7 @@ type MovieDetailType = {
 
 const MovieDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const [listEpisode, setlistEpisode] = useState<EpisodeType[]>([]);
   const [movie, setMovie] = useState<MovieDetailType | null>(null);
 
   useEffect(() => {
@@ -31,6 +33,16 @@ const MovieDetail = () => {
       axios
         .get(`https://restful-api-vercel-ol4o.vercel.app/movie/?id=${id}`)
         .then((res) => setMovie(res.data[0]))
+        .catch((err) => console.error(err));
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      axios
+        .get(`https://restful-api-vercel-ol4o.vercel.app/episode/?MovieId=${id}`)
+        
+        .then((res) => setlistEpisode(res.data))
         .catch((err) => console.error(err));
     }
   }, [id]);
@@ -48,7 +60,7 @@ const MovieDetail = () => {
       <div className="mt-6">
         <h2 className="text-lg font-semibold">Episodes:</h2>
         <ul className="list-disc pl-6">
-        {movie && Array.isArray(movie?.episodes) && movie.episodes.map((episode) => (
+        {listEpisode.map((episode) => (
             <li key={episode.id}>
               <Link to={`/movie/${movie.id}/${episode.id}`} className="text-md font-bold" >
                 {episode.title}

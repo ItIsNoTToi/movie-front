@@ -26,6 +26,7 @@ type MovieDetailType = {
 const Watch = () => {
   const { id, episode } = useParams<{ id: string; episode: string }>();
   const [episodeData, setEpisodeData] = useState<Episode | null>(null);
+  const [listEpisode, setlistEpisode] = useState<Episode[]>([]);
   const [movie, setMovie] = useState<MovieDetailType | null>(null);
 
   useEffect(() => {
@@ -34,6 +35,15 @@ const Watch = () => {
         .get(`https://restful-api-vercel-ol4o.vercel.app/movie/?id=${id}`)
         
         .then((res) => setMovie(res.data[0]))
+        .catch((err) => console.error(err));
+    }
+  }, [id]);
+  useEffect(() => {
+    if (id) {
+      axios
+        .get(`https://restful-api-vercel-ol4o.vercel.app/episode/?MovieId=${id}`)
+        
+        .then((res) => setlistEpisode(res.data))
         .catch((err) => console.error(err));
     }
   }, [id]);
@@ -80,8 +90,7 @@ const Watch = () => {
       <div className="mt-6">
         <h2 className="text-lg font-semibold mb-2">Episodes</h2>
         <ul className="space-y-1">
-        {movie && Array.isArray(movie.episodes) &&
-          movie.episodes.map((ep) => {
+        {listEpisode.map((ep) => {
             const isCurrent = ep.id.toString() === episode;
 
             return (
@@ -92,7 +101,7 @@ const Watch = () => {
                   </span>
                 ) : (
                   <Link
-                    to={`/movie/${movie.id}/${ep.id}`}
+                    to={`/movie/${id}/${ep.id}`}
                     className="text-md font-bold text-blue-600 hover:underline"
                   >
                     ▶️ {ep.title}
