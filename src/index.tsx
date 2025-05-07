@@ -5,6 +5,7 @@ import './index.css';
 import { BrowserRouter } from "react-router-dom";
 import AppRoutes from './routes/routes';  // Import các route đã tạo
 import reportWebVitals from './reportWebVitals';
+import Header from './components/header';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -12,6 +13,7 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <BrowserRouter>
+    <Header/>
     <AppRoutes />  {/* Sử dụng component routes ở đây */}
   </BrowserRouter>
 );

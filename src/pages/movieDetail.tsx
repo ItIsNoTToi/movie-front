@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import { Link } from "react-router-dom";
-import { listenerCount } from "process";
+import './MovieDetail.css';
 
 type EpisodeType = {
   id: number;
@@ -11,7 +10,6 @@ type EpisodeType = {
   episodeNumber: number;
   videoUrl: string;
   releaseDate: string;
-  // Thêm các trường khác nếu có
 };
 
 type MovieDetailType = {
@@ -20,7 +18,7 @@ type MovieDetailType = {
   description: string;
   releaseDate: string;
   posterUrl: string;
-  episodes: EpisodeType[]; // Danh sách các episode
+  episodes: EpisodeType[];
 };
 
 const MovieDetail = () => {
@@ -41,7 +39,6 @@ const MovieDetail = () => {
     if (id) {
       axios
         .get(`https://restful-api-vercel-ol4o.vercel.app/episode/?MovieId=${id}`)
-        
         .then((res) => setlistEpisode(res.data))
         .catch((err) => console.error(err));
     }
@@ -50,28 +47,27 @@ const MovieDetail = () => {
   if (!movie) return <p>Loading...</p>;
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold">{movie.title}</h1>
-      <img src={movie.posterUrl} alt={movie.title} className="w-full h-auto mt-4" />
-      <p>{movie.description}</p>
-      <p>Release Date: {movie.releaseDate}</p>
-
-      {/* Hiển thị các episode */}
-      <div className="mt-6">
+    <div className="movie-detail-container" >
+      <h1 className="movie-title">{movie.title}</h1>
+      <div style={{display: 'flex', justifyContent: 'space-around', padding: 2, }}>
+        <div>
+          <img src={movie.posterUrl} alt={movie.title} style={{ borderWidth: 10, borderColor: 'red', borderRadius: 12}} />
+        </div>
+        <div style={{ padding: 10, }}>
+          <p className="movie-description">{movie.description}</p>
+          <p className="movie-release-date">Release Date: {movie.releaseDate}</p>
+        </div>
+        <div></div>
+      </div>
+      
+      <div className="episode-list">
         <h2 className="text-lg font-semibold">Episodes:</h2>
-        <ul className="list-disc pl-6">
-        {listEpisode.map((episode) => (
-            <li key={episode.id}>
-              <Link to={`/movie/${movie.id}/${episode.id}`} className="text-md font-bold" >
+        <ul className="episode">
+          {listEpisode.map((episode) => (
+            <li key={episode.id} className="episode-item">
+              <Link to={`/movie/${movie.id}/${episode.id}`} className="episode-title">
                 {episode.title}
               </Link>
-              {/* <p>{episode.description}</p>
-              <p>Episode {episode.episodeNumber}</p>
-              <p>Release Date: {episode.releaseDate}</p> */}
-              
-              {/* <a href={episode.videoUrl} target="_blank" rel="noopener noreferrer">
-                Watch Episode
-              </a> */}
             </li>
           ))}
         </ul>

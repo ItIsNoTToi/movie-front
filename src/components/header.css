@@ -1,0 +1,28 @@
+/* src/components/Header.css */
+.header {
+    background-color: #2d3748; /* tương đương bg-gray-800 */
+    color: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .header .logo {
+    font-size: 1.25rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: red;
+  }
+  
+  .header nav a {
+    margin-right: 1rem;
+    color: white;
+    text-decoration: none;
+  }
+  
+  .header nav a:hover {
+    text-decoration: underline;
+  }
+  

@@ -14,30 +14,30 @@ type Episode = {
   subtitlesUrl: string;
 };
 
-type MovieDetailType = {
-  id: number;
-  title: string;
-  description: string;
-  releaseDate: string;
-  posterUrl: string;
-  episodes: Episode[];
-};
+// type MovieDetailType = {
+//   id: number;
+//   title: string;
+//   description: string;
+//   releaseDate: string;
+//   posterUrl: string;
+//   episodes: Episode[];
+// };
 
 const Watch = () => {
   const { id, episode } = useParams<{ id: string; episode: string }>();
   const [episodeData, setEpisodeData] = useState<Episode | null>(null);
   const [listEpisode, setlistEpisode] = useState<Episode[]>([]);
-  const [movie, setMovie] = useState<MovieDetailType | null>(null);
+  // const [movie, setMovie] = useState<MovieDetailType | null>(null);
 
-  useEffect(() => {
-    if (id) {
-      axios
-        .get(`https://restful-api-vercel-ol4o.vercel.app/movie/?id=${id}`)
+  // useEffect(() => {
+  //   if (id) {
+  //     axios
+  //       .get(`https://restful-api-vercel-ol4o.vercel.app/movie/?id=${id}`)
         
-        .then((res) => setMovie(res.data[0]))
-        .catch((err) => console.error(err));
-    }
-  }, [id]);
+  //       .then((res) => setMovie(res.data[0]))
+  //       .catch((err) => console.error(err));
+  //   }
+  // }, [id]);
   useEffect(() => {
     if (id) {
       axios
