@@ -6,13 +6,9 @@
     max-width: 800px;
   }
   
-  .link {
-    text-decoration: none;
-    color: #1d4ed8; /* Tailwind's blue-600 */
-  }
   
   .title {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: bold;
   }
   
@@ -21,6 +17,7 @@
   }
   
   .video-iframe {
+    border-radius: 5px;
     width: 100%;
     max-width: 640px;
     aspect-ratio: 16 / 9; /* Maintain aspect ratio */
@@ -42,14 +39,14 @@
   .current-episode {
     font-size: 1rem;
     font-weight: bold;
-    color: #6b7280; /* Tailwind's gray-500 */
+    color: rgb(244, 18, 18); /* Tailwind's gray-500 */
     cursor: default;
   }
   
   .episode-link {
     font-size: 1rem;
     font-weight: bold;
-    color: #1d4ed8; /* Tailwind's blue-600 */
-    text-decoration: underline;
+    text-decoration: none;
   }
+
   

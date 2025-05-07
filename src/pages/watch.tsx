@@ -67,9 +67,6 @@ const Watch = () => {
 
   return (
     <div className="container">
-      <Link to={`/`} className="link">
-        Home
-      </Link>
       <h1 className="title">{episodeData.title}</h1>
       <p className="description">{episodeData.description}</p>
       <iframe
@@ -87,7 +84,7 @@ const Watch = () => {
 
       <div className="episode-list">
         <h2 className="text-lg font-semibold mb-2">Episodes</h2>
-        <ul className="space-y-1">
+        <ul style={{ listStyle: 'none',}}>
           {listEpisode.map((ep) => {
             const isCurrent = ep.id.toString() === episode;
             return (
