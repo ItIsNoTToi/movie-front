@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
+import './watch.css';
 
 type Episode = {
   id: number;
@@ -65,44 +66,40 @@ const Watch = () => {
   if (!episodeData) return <p>Loading...</p>;
 
   return (
-    <div className="p-4 space-y-4">
-      <Link to={`/`} className="no-underline">
+    <div className="container">
+      <Link to={`/`} className="link">
         Home
       </Link>
-
-      <h1 className="text-2xl font-bold">{episodeData.title}</h1>
-      <p className="text-gray-600">{episodeData.description}</p>
-
+      <h1 className="title">{episodeData.title}</h1>
+      <p className="description">{episodeData.description}</p>
       <iframe
-        className="w-full max-w-4xl aspect-video"
+        className="video-iframe"
         src={getEmbedUrl(episodeData.videoUrl)}
         title={episodeData.title}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
       ></iframe>
-
-      <div className="text-sm text-gray-700 space-y-1">
+      <div className="details">
         <p><strong>Views:</strong> {episodeData.views}</p>
         <p><strong>Quality:</strong> {episodeData.quality}</p>
         <p><strong>Release Date:</strong> {episodeData.releaseDate}</p>
       </div>
 
-      <div className="mt-6">
+      <div className="episode-list">
         <h2 className="text-lg font-semibold mb-2">Episodes</h2>
         <ul className="space-y-1">
-        {listEpisode.map((ep) => {
+          {listEpisode.map((ep) => {
             const isCurrent = ep.id.toString() === episode;
-
             return (
-              <li key={ep.id}>
+              <li key={ep.id} className="episode-item">
                 {isCurrent ? (
-                  <span className="text-md font-bold text-gray-500 cursor-default">
+                  <span className="current-episode">
                     ▶️ {ep.title}
                   </span>
                 ) : (
                   <Link
                     to={`/movie/${id}/${ep.id}`}
-                    className="text-md font-bold text-blue-600 hover:underline"
+                    className="episode-link"
                   >
                     ▶️ {ep.title}
                   </Link>
@@ -110,7 +107,6 @@ const Watch = () => {
               </li>
             );
           })}
-
         </ul>
       </div>
     </div>

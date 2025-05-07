@@ -1,0 +1,55 @@
+/* Watch.css */
+
+.container {
+    padding: 16px;
+    margin: 0 auto;
+    max-width: 800px;
+  }
+  
+  .link {
+    text-decoration: none;
+    color: #1d4ed8; /* Tailwind's blue-600 */
+  }
+  
+  .title {
+    font-size: 2rem;
+    font-weight: bold;
+  }
+  
+  .description {
+    color: #4b5563; /* Tailwind's gray-600 */
+  }
+  
+  .video-iframe {
+    width: 100%;
+    max-width: 640px;
+    aspect-ratio: 16 / 9; /* Maintain aspect ratio */
+  }
+  
+  .details {
+    font-size: 0.875rem; /* Tailwind's text-sm */
+    color: #374151; /* Tailwind's gray-700 */
+  }
+  
+  .episode-list {
+    margin-top: 24px;
+  }
+  
+  .episode-item {
+    margin-bottom: 8px;
+  }
+  
+  .current-episode {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #6b7280; /* Tailwind's gray-500 */
+    cursor: default;
+  }
+  
+  .episode-link {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #1d4ed8; /* Tailwind's blue-600 */
+    text-decoration: underline;
+  }
+  
