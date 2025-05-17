@@ -4,7 +4,9 @@ import { fetchMovies } from "../services/movieService";
 import { Link } from "react-router-dom";
 import './home.css'
 
+
 const Home = () => {
+  const [user, setUser] = useState(null);
   const [movies, setMovies] = useState<Movie[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [genreFilter, setGenreFilter] = useState("All");
@@ -12,9 +14,16 @@ const Home = () => {
   const genres = ["All", "Action", "Drama", "Comedy", "Horror"];
   const hotKeywords = ["Avengers", "Fast & Furious", "Oppenheimer", "Marvel"];
 
+
   useEffect(() => {
-    fetchMovies().then(setMovies);
+    fetchMovies()
+      .then(data => {
+        setMovies(data.movies);
+        setUser(data.user);
+      })
+      .catch(console.error);
   }, []);
+
 
   const filteredMovies = movies.filter((movie) => {
     const matchesSearch = movie.title.toLowerCase().includes(searchTerm.toLowerCase());
