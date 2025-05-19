@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
-import axios from 'axios';
+import axios from '../axiosConfig';
 
 const LoginPage: React.FC = () => {
 
@@ -51,18 +51,18 @@ const LoginPage: React.FC = () => {
         }
 
         try {
-            const response = await axios.post('http://localhost:3000/login', {
+            const response = await axios.post('/login', {
                 email,
                 password,
-            },{
-                withCredentials: true,
             }); // Gửi cookie
 
             if (response.status === 200) {
                 setSubmitMessage('Login successful!');
                 localStorage.setItem("token", JSON.stringify(response.data.token));
+                localStorage.setItem("role", JSON.stringify(response.data.role));
                 // console.log('Login success:', response.data);
-                return navigate('/');
+                return window.location.href = '/'; 
+                // return navigate('/');
                 // return window.location.href = '/login'; 
                 // Optional: redirect or set token
             } else {
@@ -114,6 +114,10 @@ const LoginPage: React.FC = () => {
 
             {submitMessage && <div style={styles.success}>{submitMessage}</div>}
             </form>
+
+            <button style={styles.button} onClick={() => navigate('/register')}>
+                Register
+            </button>
         </div>
     );
 };
@@ -182,6 +186,7 @@ const styles: { [key: string]: React.CSSProperties } = {
         fontWeight: 700,
         fontSize: '1rem',
         transition: 'background-color 0.3s ease',
+        margin: '5px 0%',
     },
 };
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import axios from "../axiosConfig";
 import './watch.css';
 
 type Episode = {
@@ -42,9 +42,12 @@ const Watch = () => {
   useEffect(() => {
     if (id) {
       axios
-        .get(`https://restful-api-vercel-ol4o.vercel.app/episode/?MovieId=${id}`)
-        
-        .then((res) => setlistEpisode(res.data))
+        .get(`/movie/${id}`)
+        .then((res) => {
+          const listE = res.data.movie.episodes;
+          // console.log(listE);
+          setlistEpisode(listE);
+        })
         .catch((err) => console.error(err));
     }
   }, [id]);
@@ -52,8 +55,12 @@ const Watch = () => {
   useEffect(() => {
     if (id && episode) {
       axios
-        .get(`https://restful-api-vercel-ol4o.vercel.app/episode/?MovieId=${id}&id=${episode}`)
-        .then((res) => setEpisodeData(res.data[0]))
+        .get(`/movie/${id}/${episode}`)
+        .then((res) => {
+          const Episode = res.data.episode;
+          // console.log(Episode);
+          setEpisodeData(Episode);
+        })
         .catch((err) => console.error(err));
     }
   }, [id, episode]);
@@ -63,7 +70,8 @@ const Watch = () => {
     return videoIdMatch ? `https://www.youtube.com/embed/${videoIdMatch[1]}` : "";
   };
 
-  if (!episodeData) return <p>Loading...</p>;
+  if (!episodeData) return <p>Loading...</p>
+  // else console.log(episodeData);
 
   return (
     <div className="container">

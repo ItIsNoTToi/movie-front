@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import axios from "../axiosConfig";
 import './MovieDetail.css';
 
 type EpisodeType = {
@@ -25,26 +25,20 @@ const MovieDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [listEpisode, setlistEpisode] = useState<EpisodeType[]>([]);
   const [movie, setMovie] = useState<MovieDetailType | null>(null);
-
+  
   useEffect(() => {
     if (id) {
-      axios
-        .get(`https://restful-api-vercel-ol4o.vercel.app/movie/?id=${id}`)
-        .then((res) => setMovie(res.data[0]))
-        .catch((err) => console.error(err));
-    }
-  }, [id]);
-
-  useEffect(() => {
-    if (id) {
-      axios
-        .get(`https://restful-api-vercel-ol4o.vercel.app/episode/?MovieId=${id}`)
-        .then((res) => setlistEpisode(res.data))
-        .catch((err) => console.error(err));
-    }
+      axios.get(`/movie/${id}`)
+        .then(res => {
+          const moviedetail = res.data.movie; // lấy đúng key "movie"
+          setMovie(moviedetail);
+          setlistEpisode(moviedetail.episodes || []);
+        })
+        .catch(err => console.error(err));}
   }, [id]);
 
   if (!movie) return <p>Loading...</p>;
+  // else console.log(listEpisode);
 
   return (
     <div className="movie-detail-container" >

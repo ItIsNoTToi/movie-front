@@ -1,10 +1,16 @@
-import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from "../axiosConfig"; 
+import AdminPage from './Admin/dashboard';
+import { useNavigate } from 'react-router-dom';
 
 const ProfilePage: React.FC = () => {
+
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState('John Doe');
-  const [email, setEmail] = useState('john.doe@example.com');
+
+  const [name, setName] = useState('');
+  const [role, setRole] = useState('');
+  const [email, setEmail] = useState('');
   const [nameError, setNameError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [saveMessage, setSaveMessage] = useState('');
@@ -43,17 +49,34 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-    const Logout = async () => {
-        try {
-            await axios.post('http://localhost:3000/logout', {}, { withCredentials: true });
-            // localStorage.removeItem('user'); // nếu bạn lưu user ở localStorage
-            localStorage.removeItem('token'); 
-            window.location.href = '/login'; // chuyển hướng về trang đăng nhập
-        } catch (error) {
-            console.error('Logout failed:', error);
-        }
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await axios.get(`/profile`);
+        const user = res.data.user;
+        // console.log(user); // hoặc set state
+        const role = res.data.userrole;
+        setRole(role);
+        setName(user.username);
+        setEmail(user.email)
+      } catch (error) {
+        console.error("Lỗi khi lấy profile:", error);
+      }
     };
 
+    fetchProfile();
+  }, []);
+
+  const Logout = async () => {
+      try {
+          await axios.post('/logout');
+          // localStorage.removeItem('user'); // nếu bạn lưu user ở localStorage
+          localStorage.removeItem('token'); 
+          window.location.href = '/login'; // chuyển hướng về trang đăng nhập
+      } catch (error) {
+          console.error('Logout failed:', error);
+      }
+  };
 
   return (
     <div style={styles.container}>
@@ -117,9 +140,19 @@ const ProfilePage: React.FC = () => {
             </button>
           )}
 
-            <button onClick={Logout} style={styles.editButton}>
-              Log out
-            </button>
+          {
+            role == 'Admin' ?
+            (
+              <button onClick={()=> navigate('/9710010910511011297103101')} style={styles.editButton}>
+                Admin Page
+              </button>
+            )
+            : ('')
+          }
+
+          <button onClick={Logout} style={styles.editButton}>
+            Log out
+          </button>
         </div>
 
         {saveMessage && <div style={styles.success}>{saveMessage}</div>}
