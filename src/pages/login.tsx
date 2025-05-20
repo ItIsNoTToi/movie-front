@@ -4,24 +4,22 @@ import useAuth from '../hooks/useAuth';
 import axios from '../axiosConfig';
 
 const LoginPage: React.FC = () => {
-
-    const navigate = useNavigate();
+  const navigate = useNavigate();
     const { isLoggedIn } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [submitMessage, setSubmitMessage] = useState('');
-    
+
     useEffect(() => {
         if (isLoggedIn) {
             navigate('/profile');
-            return
+            return;
         }
-    },[]);
+    }, [isLoggedIn, navigate]);
 
     const validateEmail = (email: string) => {
-        // Basic email regex for validation
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return re.test(email.toLowerCase());
     };
@@ -54,17 +52,14 @@ const LoginPage: React.FC = () => {
             const response = await axios.post('/login', {
                 email,
                 password,
-            }); // Gửi cookie
+            });
 
             if (response.status === 200) {
                 setSubmitMessage('Login successful!');
                 localStorage.setItem("token", JSON.stringify(response.data.token));
                 localStorage.setItem("role", JSON.stringify(response.data.role));
-                // console.log('Login success:', response.data);
-                return window.location.href = '/'; 
-                // return navigate('/');
-                // return window.location.href = '/login'; 
-                // Optional: redirect or set token
+                // navigate('/'); 
+                window.location.href = '/';
             } else {
                 setSubmitMessage('Login failed. Please try again.');
             }
@@ -74,120 +69,142 @@ const LoginPage: React.FC = () => {
         }
     };
 
-
     return (
-        <div style={styles.container}>
-            <form style={styles.form} onSubmit={handleSubmit} noValidate>
-            <h2 style={styles.title}>Login</h2>
+    <div style={styles.container}>
+      <form style={styles.form} onSubmit={handleSubmit} noValidate>
+        <h2 style={styles.title}>Sign In</h2>
 
-            <label htmlFor="email" style={styles.label}>
-                Email
-            </label>
-            <input
-                type="email"
-                id="email"
-                style={{ ...styles.input, borderColor: emailError ? '#e74c3c' : '#ccc' }}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-            />
-            {emailError && <div style={styles.error}>{emailError}</div>}
+        <label htmlFor="email" style={styles.label}>Email</label>
+        <input
+          type="email"
+          id="email"
+          style={{ ...styles.input, borderColor: emailError ? '#e74c3c' : '#ccc' }}
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          placeholder="you@example.com"
+        />
+        {emailError && <div style={styles.error}>{emailError}</div>}
 
-            <label htmlFor="password" style={styles.label}>
-                Password
-            </label>
-            <input
-                type="password"
-                id="password"
-                style={{ ...styles.input, borderColor: passwordError ? '#e74c3c' : '#ccc' }}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Your password"
-                required
-            />
-            {passwordError && <div style={styles.error}>{passwordError}</div>}
+        <label htmlFor="password" style={styles.label}>Password</label>
+        <input
+          type="password"
+          id="password"
+          style={{ ...styles.input, borderColor: passwordError ? '#e74c3c' : '#ccc' }}
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          placeholder="Enter your password"
+        />
+        {passwordError && <div style={styles.error}>{passwordError}</div>}
 
-            <button type="submit" style={styles.button}>
-                Sign In
-            </button>
+        <button type="submit" style={styles.loginButton}>Login</button>
 
-            {submitMessage && <div style={styles.success}>{submitMessage}</div>}
-            </form>
+        {submitMessage && <div style={styles.success}>{submitMessage}</div>}
 
-            <button style={styles.button} onClick={() => navigate('/register')}>
-                Register
-            </button>
+        <div style={styles.registerSection}>
+          <span style={styles.registerText}>Don't have an account?</span>
+          <button
+            type="button"
+            style={styles.registerButton}
+            onClick={() => navigate('/register')}
+          >
+            Register
+          </button>
         </div>
-    );
+      </form>
+    </div>
+  );
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
-    container: {
-        height: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        background: 'linear-gradient(135deg, #667eea, #764ba2)',
-        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-    },
-    form: {
-        backgroundColor: '#fff',
-        padding: '2.5rem 3rem',
-        borderRadius: 12,
-        boxShadow: '0 12px 24px rgba(0,0,0,0.2)',
-        width: '100%',
-        maxWidth: 400,
-        boxSizing: 'border-box',
-    },
-    title: {
-        marginBottom: 24,
-        fontWeight: 700,
-        fontSize: '1.75rem',
-        color: '#333',
-        textAlign: 'center',
-    },
-    label: {
-        display: 'block',
-        marginBottom: 8,
-        fontWeight: 600,
-        color: '#555',
-    },
-    input: {
-        width: '100%',
-        padding: '0.75rem 1rem',
-        marginBottom: 16,
-        borderRadius: 6,
-        border: '1.5px solid #ccc',
-        fontSize: '1rem',
-        transition: 'border-color 0.3s ease',
-        outline: 'none',
-    },
-    error: {
-        color: '#e74c3c',
-        fontSize: '0.875rem',
-        marginTop: -12,
-        marginBottom: 12,
-    },
-    success: {
-        marginTop: 12,
-        color: '#27ae60',
-        fontWeight: '600',
-        textAlign: 'center',
-    },
-    button: {
-        width: '100%',
-        padding: '0.75rem 1rem',
-        backgroundColor: '#667eea',
-        color: 'white',
-        border: 'none',
-        borderRadius: 6,
-        cursor: 'pointer',
-        fontWeight: 700,
-        fontSize: '1rem',
-        transition: 'background-color 0.3s ease',
-        margin: '5px 0%',
-    },
+  container: {
+    height: '100vh',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    background: 'linear-gradient(135deg, #667eea, #764ba2)',
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    padding: '0 20px',
+  },
+  form: {
+    backgroundColor: '#fff',
+    padding: '3rem 2.5rem',
+    borderRadius: 12,
+    boxShadow: '0 15px 30px rgba(0,0,0,0.2)',
+    width: '100%',
+    maxWidth: 400,
+    boxSizing: 'border-box',
+    textAlign: 'center',
+  },
+  title: {
+    marginBottom: 30,
+    fontSize: '1.9rem',
+    fontWeight: '700',
+    color: '#333',
+  },
+  label: {
+    display: 'block',
+    textAlign: 'left',
+    marginBottom: 8,
+    fontWeight: 600,
+    color: '#555',
+  },
+  input: {
+    width: '100%',
+    padding: '12px 15px',
+    marginBottom: 20,
+    borderRadius: 8,
+    border: '1.8px solid #ccc',
+    fontSize: 16,
+    outline: 'none',
+    transition: 'border-color 0.3s ease',
+  },
+  error: {
+    textAlign: 'left',
+    marginTop: -14,
+    marginBottom: 16,
+    color: '#e74c3c',
+    fontSize: 14,
+  },
+  loginButton: {
+    width: '100%',
+    padding: '14px 0',
+    fontWeight: '700',
+    fontSize: 18,
+    color: '#fff',
+    backgroundColor: '#667eea',
+    border: 'none',
+    borderRadius: 10,
+    cursor: 'pointer',
+    transition: 'background-color 0.3s ease',
+  },
+  success: {
+    marginTop: 16,
+    color: '#27ae60',
+    fontWeight: 600,
+    fontSize: 16,
+  },
+  registerSection: {
+    marginTop: 30,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 12,
+  },
+  registerText: {
+    color: '#555',
+    fontSize: 15,
+  },
+  registerButton: {
+    color: '#667eea',
+    border: '2px solid #667eea',
+    padding: '8px 20px',
+    fontWeight: 600,
+    borderRadius: 8,
+    cursor: 'pointer',
+    backgroundColor: 'transparent',
+    fontSize: 15,
+    transition: 'all 0.3s ease',
+  },
 };
 
 export default LoginPage;

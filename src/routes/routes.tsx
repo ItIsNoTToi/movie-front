@@ -9,6 +9,7 @@ import Dashboard from "../pages/Admin/dashboard";
 import RequireAdmin from "../middlewares/RequireAdmin";
 import NotFoundPage from "../pages/Error";
 import RegisterPage from "../pages/register";
+import AdminMovieManagementPage from "../pages/Admin/movie_dashboard";
 
 
 const AppRoutes = () => (
@@ -20,7 +21,8 @@ const AppRoutes = () => (
     <Route path="/profile" element={<ProfilePage />} />
     <Route path="/9710010910511011297103101" element={<RequireAdmin />}>
       <Route index element={<Dashboard />} />
-    </Route>  
+      <Route path="movies" element={<AdminMovieManagementPage />} />
+    </Route>
     <Route path="*" element={<NotFoundPage />} />
     <Route path="/login" element={<LoginPage />} />
     <Route path="/register" element={<RegisterPage />} />

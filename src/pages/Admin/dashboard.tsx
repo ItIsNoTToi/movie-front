@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface CardProps {
   title: string;
@@ -33,6 +34,7 @@ const initialUsers: User[] = [
 ];
 
 const AdminPage: React.FC = () => {
+  const navigation = useNavigate();
   const [users, setUsers] = useState<User[]>(initialUsers);
 
   return (
@@ -41,8 +43,17 @@ const AdminPage: React.FC = () => {
         <h2 style={styles.sidebarTitle}>Admin Panel</h2>
         <nav>
           <ul style={styles.navList}>
-            <li style={styles.navItem}>Dashboard</li>
-            <li style={styles.navItem}>Users</li>
+            <li style={styles.navItem} onClick={() => navigation('/9710010910511011297103101')}>Dashboard</li>
+            <li style={styles.navItem}>
+              <a 
+                href="/9710010910511011297103101/movies" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{ color: 'inherit', textDecoration: 'none' }}
+              >
+                Movies
+              </a>
+            </li>
             <li style={styles.navItem}>Settings</li>
             <li style={styles.navItem}>Logs</li>
           </ul>

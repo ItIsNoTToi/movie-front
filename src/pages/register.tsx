@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { blob } from 'stream/consumers';
 
 interface FormData {
   fullName: string;
@@ -10,8 +9,7 @@ interface FormData {
 }
 
 const RegisterPage: React.FC = () => {
-
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
@@ -49,11 +47,8 @@ const RegisterPage: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    // Clear the error on change for that field
     setErrors(prev => ({ ...prev, [e.target.name]: undefined }));
   };
 
@@ -68,13 +63,13 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div style={{ display: 'block', justifyContent: 'center', alignItems: 'center', width: '100%',}}>
-        <div style={styles.container}>
+    <div style={styles.container}>
+      <div style={styles.formContainer}>
         <form style={styles.form} onSubmit={handleSubmit} noValidate>
-            <h2 style={styles.title}>Register</h2>
+          <h2 style={styles.title}>Create an Account</h2>
 
-            <label style={styles.label} htmlFor="fullName">Full Name</label>
-            <input
+          <label style={styles.label} htmlFor="fullName">Full Name</label>
+          <input
             style={{ ...styles.input, borderColor: errors.fullName ? '#f44336' : '#ccc' }}
             type="text"
             id="fullName"
@@ -82,11 +77,11 @@ const RegisterPage: React.FC = () => {
             value={formData.fullName}
             onChange={handleChange}
             placeholder="Your full name"
-            />
-            {errors.fullName && <p style={styles.error}>{errors.fullName}</p>}
+          />
+          {errors.fullName && <p style={styles.error}>{errors.fullName}</p>}
 
-            <label style={styles.label} htmlFor="email">Email</label>
-            <input
+          <label style={styles.label} htmlFor="email">Email</label>
+          <input
             style={{ ...styles.input, borderColor: errors.email ? '#f44336' : '#ccc' }}
             type="email"
             id="email"
@@ -94,11 +89,11 @@ const RegisterPage: React.FC = () => {
             value={formData.email}
             onChange={handleChange}
             placeholder="you@example.com"
-            />
-            {errors.email && <p style={styles.error}>{errors.email}</p>}
+          />
+          {errors.email && <p style={styles.error}>{errors.email}</p>}
 
-            <label style={styles.label} htmlFor="password">Password</label>
-            <input
+          <label style={styles.label} htmlFor="password">Password</label>
+          <input
             style={{ ...styles.input, borderColor: errors.password ? '#f44336' : '#ccc' }}
             type="password"
             id="password"
@@ -107,11 +102,11 @@ const RegisterPage: React.FC = () => {
             onChange={handleChange}
             placeholder="At least 6 characters"
             autoComplete="new-password"
-            />
-            {errors.password && <p style={styles.error}>{errors.password}</p>}
+          />
+          {errors.password && <p style={styles.error}>{errors.password}</p>}
 
-            <label style={styles.label} htmlFor="confirmPassword">Confirm Password</label>
-            <input
+          <label style={styles.label} htmlFor="confirmPassword">Confirm Password</label>
+          <input
             style={{ ...styles.input, borderColor: errors.confirmPassword ? '#f44336' : '#ccc' }}
             type="password"
             id="confirmPassword"
@@ -120,29 +115,17 @@ const RegisterPage: React.FC = () => {
             onChange={handleChange}
             placeholder="Re-enter your password"
             autoComplete="new-password"
-            />
-            {errors.confirmPassword && <p style={styles.error}>{errors.confirmPassword}</p>}
+          />
+          {errors.confirmPassword && <p style={styles.error}>{errors.confirmPassword}</p>}
 
-            <button type="submit" style={styles.button}>Register</button>
+          <button type="submit" style={styles.button}>Register</button>
 
-            {submitted && <p style={styles.success}>Registration successful!</p>}
-            </form>
-            
-        </div>
-        <button style={{width: '50%',
-                        padding: '12px',
-                        fontSize: 18,
-                        fontWeight: 'bold',
-                        color: '#fff',
-                        backgroundColor: '#2f89fc',
-                        border: 'none',
-                        borderRadius: 8,
-                        cursor: 'pointer',
-                        textAlign: 'center',
-                        transition: 'background-color 0.3s',
-                        }} onClick={() => navigate('/login')}>
-            Sign in
-        </button>
+          {submitted && <p style={styles.success}>Registration successful!</p>}
+        </form>
+      </div>
+      <button style={styles.signInButton} onClick={() => navigate('/login')}>
+        Already have an account? Sign in
+      </button>
     </div>
   );
 };
@@ -151,14 +134,14 @@ const styles: { [key: string]: React.CSSProperties } = {
   container: {
     minHeight: '100vh',
     display: 'flex',
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f4f7fa',
     fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
     padding: 20,
-    width: '100%',
   },
-  form: {
+  formContainer: {
     backgroundColor: '#fff',
     padding: 30,
     borderRadius: 12,
@@ -166,6 +149,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     width: '100%',
     maxWidth: 400,
     boxSizing: 'border-box',
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
   },
   title: {
     marginBottom: 30,
@@ -215,6 +202,20 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: '#4caf50',
     fontWeight: '600',
     textAlign: 'center',
+  },
+  signInButton: {
+    marginTop: 20,
+    width: '50%',
+    padding: '12px',
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+    backgroundColor: '#2f89fc',
+    border: 'none',
+    borderRadius: 8,
+    cursor: 'pointer',
+    textAlign: 'center',
+    transition: 'background-color 0.3s',
   },
 };
 
