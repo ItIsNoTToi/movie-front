@@ -1,52 +1,94 @@
-/* Watch.css */
+/* watch.css */
+
+/* Tổng thể */
+body {
+  background-color: #eeeaea;
+  color: #bc0d0d;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+}
 
 .container {
-    padding: 16px;
-    margin: 0 auto;
-    max-width: 800px;
-  }
-  
-  
-  .title {
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
-  
-  .description {
-    color: #4b5563; /* Tailwind's gray-600 */
-  }
-  
-  .video-iframe {
-    border-radius: 5px;
-    width: 100%;
-    max-width: 640px;
-    aspect-ratio: 16 / 9; /* Maintain aspect ratio */
-  }
-  
-  .details {
-    font-size: 0.875rem; /* Tailwind's text-sm */
-    color: #374151; /* Tailwind's gray-700 */
-  }
-  
-  .episode-list {
-    margin-top: 24px;
-  }
-  
-  .episode-item {
-    margin-bottom: 8px;
-  }
-  
-  .current-episode {
-    font-size: 1rem;
-    font-weight: bold;
-    color: rgb(244, 18, 18); /* Tailwind's gray-500 */
-    cursor: default;
-  }
-  
-  .episode-link {
-    font-size: 1rem;
-    font-weight: bold;
-    text-decoration: none;
-  }
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #1e1e1e;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+}
 
-  
+/* Tiêu đề và mô tả */
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #ffffff;
+}
+
+.description {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  color: #cccccc;
+}
+
+/* Video iframe */
+.video-iframe {
+  width: 100%;
+  height: 500px;
+  border: none;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+/* Chi tiết tập */
+.details p {
+  margin: 6px 0;
+  color: #b0b0b0;
+}
+
+.details strong {
+  color: #ffffff;
+}
+
+/* Danh sách tập phim */
+.episode-list {
+  margin-top: 30px;
+}
+
+.episode-list h2 {
+  font-size: 1.3rem;
+  margin-bottom: 12px;
+  color: #ffffff;
+  border-bottom: 1px solid #444;
+  padding-bottom: 6px;
+}
+
+.episode-item {
+  margin: 10px 0;
+}
+
+.episode-link,
+.current-episode {
+  display: inline-block;
+  text-decoration: none;
+  font-size: 1rem;
+  color: #90caf9;
+  background-color: #2a2a2a;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.episode-link:hover {
+  background-color: #333;
+  color: #ffffff;
+}
+
+.current-episode {
+  background-color: #424242;
+  color: #ffffff;
+  font-weight: bold;
+  cursor: default;
+}

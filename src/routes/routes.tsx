@@ -10,6 +10,7 @@ import RequireAdmin from "../middlewares/RequireAdmin";
 import NotFoundPage from "../pages/Error";
 import RegisterPage from "../pages/register";
 import AdminMovieManagementPage from "../pages/Admin/movie_dashboard";
+import AdminEpisodeManagementPage from "../pages/Admin/episodes_dashboard";
 
 
 const AppRoutes = () => (
@@ -22,6 +23,7 @@ const AppRoutes = () => (
     <Route path="/9710010910511011297103101" element={<RequireAdmin />}>
       <Route index element={<Dashboard />} />
       <Route path="movies" element={<AdminMovieManagementPage />} />
+      <Route path="movies/:movieId/episodes" element={<AdminEpisodeManagementPage />} />
     </Route>
     <Route path="*" element={<NotFoundPage />} />
     <Route path="/login" element={<LoginPage />} />

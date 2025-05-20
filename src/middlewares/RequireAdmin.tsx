@@ -8,6 +8,7 @@ const RequireAdmin = () => {
     const role = JSON.parse(localStorage.getItem("role") || "{}");
 
     if (!role || role !== "Admin") {
+      window.location.href='/';
       navigate("/"); // Chuyển hướng nếu không phải admin
     }
   }, []);

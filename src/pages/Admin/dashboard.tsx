@@ -37,6 +37,11 @@ const AdminPage: React.FC = () => {
   const navigation = useNavigate();
   const [users, setUsers] = useState<User[]>(initialUsers);
 
+  const role = JSON.parse(localStorage.getItem("role") || "{}");
+  if(role != 'Admin'){
+    return <div>Cut </div>
+  }
+  else
   return (
     <div style={styles.container}>
       <aside style={styles.sidebar}>
