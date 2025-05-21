@@ -11,3 +11,19 @@ export const fetchMovies = async (): Promise<MovieResponse> => {
   //console.log(res.data)
   return res.data;
 };
+
+export const AddMovie = async (data: Partial<Movie>): Promise<MovieResponse> => {
+  const res = await axios.post('/9710010910511011297103101/createMovie', { 
+    title: data.title,
+    description: data.description,
+    releaseDate: data.releaseDate,
+    director: data.director,
+    duration: data.duration,
+    language: data.language,
+    posterUrl: data.posterUrl,
+    rating: data.rating,
+    isActive: data.isActive,
+    // genres: data.genres, // nếu có
+  });
+  return res.data;
+};

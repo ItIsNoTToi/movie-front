@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { fetchMovies } from '../../services/movieService';
+import { AddMovie, fetchMovies } from '../../services/movieService';
 import { Genre, Movie } from '../../types/movie';
 import { v4 as uuidv4 } from 'uuid';
+import { json } from 'stream/consumers';
 
 const AdminMovieManagementPage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[] | null>(null);
@@ -9,11 +10,16 @@ const AdminMovieManagementPage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
   const [formData, setFormData] = useState({
-    title: '',
-    genres: '',
-    year: '',
-    rating: '',
-    language: '',
+    title: "",
+    description: "",
+    releaseDate: "",
+    director: "",
+    language: "",
+    duration: 0,
+    posterUrl: "",
+    rating: 0,
+    isActive: true,
+    genres: [] as Genre[],
   });
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
@@ -29,7 +35,18 @@ const AdminMovieManagementPage: React.FC = () => {
   }, []);
 
   const resetForm = () => {
-    setFormData({ title: '', genres: '', year: '', rating: '', language: '' });
+    setFormData({ 
+      title: "",
+      description: "",
+      releaseDate: '',
+      director: "",
+      duration: 0,
+      language: "",
+      posterUrl: "",
+      rating: 0,
+      isActive: true,
+      genres: [],
+    });
     setFormErrors({});
     setEditingMovie(null);
     setIsEditing(false);
@@ -38,35 +55,37 @@ const AdminMovieManagementPage: React.FC = () => {
   const validateForm = () => {
     const errors: { [key: string]: string } = {};
     if (!formData.title.trim()) errors.title = 'Title is required';
-    if (!formData.genres.trim()) errors.genres = 'Genres are required';
-    if (!formData.year.trim() || isNaN(Number(formData.year)) || Number(formData.year) < 1888)
-      errors.year = 'Valid year is required (>=1888)';
-    if (!formData.rating.trim() || isNaN(Number(formData.rating)) || Number(formData.rating) < 0 || Number(formData.rating) > 10)
+    if (!formData.genres || formData.genres.length === 0)
+      errors.genres = 'Genres are required';
+    if (!formData.releaseDate.trim()) {
+      errors.releaseDate = 'Release date is required';
+    }
+    if (!formData.rating || isNaN(Number(formData.rating)) || Number(formData.rating) < 0 || Number(formData.rating) > 10)
       errors.rating = 'Rating must be between 0 and 10';
     if (!formData.language.trim()) errors.language = 'Language is required';
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
     setFormErrors(prev => ({ ...prev, [e.target.name]: '' }));
   };
 
   const handleAddClick = () => {
-    resetForm();
+    // resetForm();
     setIsEditing(true);
   };
 
   const handleEditClick = (movie: Movie) => {
     setEditingMovie(movie);
-    setFormData({
-      title: movie.title,
-      genres: movie.genres.map(g => g.name).join(', '),
-      year: new Date(movie.releaseDate).getFullYear().toString(),
-      rating: movie.rating.toString(),
-      language: movie.language || '',
-    });
+    // setFormData({
+    //   title: movie.title,
+    //   // genres: movie.genres.map(g => g.name).join(', '),
+    //   releaseDate: new Date(movie.releaseDate).getFullYear().toString(),
+    //   rating: movie.rating,
+    //   language: movie.language || '',
+    // });
     setIsEditing(true);
   };
 
@@ -76,39 +95,44 @@ const AdminMovieManagementPage: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-
-    const genreList: Genre[] = formData.genres
-      .split(',')
-      .map((name, idx) => ({ id: idx + 1, name: name.trim() }));
 
     const movieData: Movie = {
       id: editingMovie ? editingMovie.id : uuidv4(),
       title: formData.title,
-      description: editingMovie?.description || '',
-      posterUrl: editingMovie?.posterUrl || '',
-      director: editingMovie?.director,
+      description: formData.description,
+      releaseDate: formData.releaseDate,
+      director: formData.director,
+      duration: formData.duration,
       language: formData.language,
-      videoUrl: editingMovie?.videoUrl || '',
-      genre: genreList.map(g => g.name),
-      genres: genreList,
-      rating: parseFloat(formData.rating),
-      isActive: editingMovie ? editingMovie.isActive : true,
-      releaseDate: `${formData.year}-01-01`,
+      posterUrl: formData.posterUrl,
+      rating: formData.rating,
+      isActive: formData.isActive,
+      genres: formData.genres,
+      videoUrl: "", // nếu có trường này
     };
 
-    if (editingMovie) {
-      // Update existing
-      setMovies(prev => prev?.map(m => m.id === editingMovie.id ? movieData : m) || null);
-    } else {
-      // Add new
-      setMovies(prev => prev ? [...prev, movieData] : [movieData]);
+    try {
+      if (editingMovie) {
+        // Update movie local
+        setMovies(prev => prev?.map(m => m.id === editingMovie.id ? movieData : m) || null);
+      } else {
+        // Add movie
+        setMovies(prev => prev ? [...prev, movieData] : [movieData]);
+        AddMovie(movieData).then(data => {
+          console.log(data);
+        })
+        
+      }
+      resetForm();
+    } catch (error) {
+      console.error(error);
     }
-
-    resetForm();
   };
+
+
 
   return (
     <div style={styles.pageContainer}>
@@ -157,7 +181,7 @@ const AdminMovieManagementPage: React.FC = () => {
                     <td style={styles.td}>{movie.releaseDate}</td>
                     <td style={styles.td}>{movie.language}</td>
                     <td style={styles.td}>{movie.genres.map(g => g.name).join(', ')}</td>
-                    <td style={styles.td}>{movie.rating.toFixed(1)}</td>
+                    <td style={styles.td}>{movie.rating}</td>
                     <td style={styles.td}>
                         <span style={{ color: movie.isActive ? 'green' : 'red' }}>
                         {movie.isActive ? 'Đang hiển thị' : 'Đã ẩn'}
@@ -197,23 +221,29 @@ const AdminMovieManagementPage: React.FC = () => {
               <label style={styles.label}>Genres (comma separated)</label>
               <input
                 type="text"
-                name="genres"
-                value={formData.genres}
-                onChange={handleInputChange}
+                placeholder="e.g. Action, Sci-Fi"
+                value={formData.genres.map(g => g.name).join(', ')}
+                onChange={(e) => {
+                  const genreNames = e.target.value.split(',').map(name => name.trim()).filter(Boolean);
+                  setFormData(prev => ({
+                    ...prev,
+                    genres: genreNames.map((name, idx) => ({ id: idx + 1, name })),
+                  }));
+                  setFormErrors(prev => ({ ...prev, genres: '' }));
+                }}
                 style={{ ...styles.input, borderColor: formErrors.genres ? '#f44336' : '#ccc' }}
               />
               {formErrors.genres && <span style={styles.error}>{formErrors.genres}</span>}
 
-              <label style={styles.label}>Year</label>
+              <label style={styles.label}>Release Date</label>
               <input
-                type="number"
-                name="year"
-                value={formData.year}
+                type="date"
+                name="releaseDate"
+                value={formData.releaseDate}
                 onChange={handleInputChange}
-                style={{ ...styles.input, borderColor: formErrors.year ? '#f44336' : '#ccc' }}
-                min={1888}
-                max={new Date().getFullYear() + 5}
+                style={{ ...styles.input, borderColor: formErrors.releaseDate ? '#f44336' : '#ccc' }}
               />
+
               {formErrors.year && <span style={styles.error}>{formErrors.year}</span>}
 
               <label style={styles.label}>Rating (0 - 10)</label>
@@ -238,6 +268,15 @@ const AdminMovieManagementPage: React.FC = () => {
                 style={{ ...styles.input, borderColor: formErrors.language ? '#f44336' : '#ccc' }}
               />
               {formErrors.language && <span style={styles.error}>{formErrors.language}</span>}
+
+              <label style={styles.label}>Description</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                style={styles.input}
+              />
+
 
               <div style={styles.formButtons}>
                 <button type="submit" style={styles.saveButton}>

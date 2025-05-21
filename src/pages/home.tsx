@@ -27,8 +27,7 @@ const Home = () => {
 
   const filteredMovies = movies.filter((movie) => {
     const matchesSearch = movie.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesGenre = genreFilter === "All" || movie.genre.includes(genreFilter);
-    return matchesSearch && matchesGenre;
+    return matchesSearch ;
   });
 
   // const hotMovies = movies.slice(0, 5); // Top 5 phim hot làm ví dụ
@@ -72,7 +71,6 @@ const Home = () => {
             <div key={movie.id} className="movie-card">
               <img src={movie.posterUrl} alt={movie.title} />
               <h2 className="movie-title">{movie.title}</h2>
-              <p>{movie.genre}</p>
             </div>
           </Link>
         ))}

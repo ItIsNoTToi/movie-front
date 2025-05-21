@@ -4,9 +4,9 @@ export interface Movie {
   description: string;
   posterUrl: string;
   director?: string;
+  duration?: number
   language?: string;
   videoUrl: string;
-  genre: string[];
   rating: number;
   isActive: boolean;
   releaseDate: string;
