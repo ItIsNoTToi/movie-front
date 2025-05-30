@@ -27,3 +27,9 @@ export const AddMovie = async (data: Partial<Movie>): Promise<MovieResponse> => 
   });
   return res.data;
 };
+
+
+export const DeleteMovie = async (id: any): Promise<MovieResponse> => {
+  const res = await axios.delete(`/9710010910511011297103101/deleteMovie/${id}`);
+  return res.data;
+};

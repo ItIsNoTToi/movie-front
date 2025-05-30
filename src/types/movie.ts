@@ -3,6 +3,7 @@ export interface Movie {
   title: string;
   description: string;
   posterUrl: string;
+  hashtag: string
   director?: string;
   duration?: number
   language?: string;

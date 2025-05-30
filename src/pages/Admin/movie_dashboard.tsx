@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { AddMovie, fetchMovies } from '../../services/movieService';
+import { AddMovie, DeleteMovie, fetchMovies } from '../../services/movieService';
 import { Genre, Movie } from '../../types/movie';
 import { v4 as uuidv4 } from 'uuid';
 import { json } from 'stream/consumers';
+import { fetchGenres } from '../../services/genreservices';
+import Select from 'react-select';
 
 const AdminMovieManagementPage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[] | null>(null);
+  const [genres, setgenres] = useState<Genre[] | null>(null);  
+  const [hashtags, setHashtags] = useState<string[]>([]);
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
@@ -13,6 +18,7 @@ const AdminMovieManagementPage: React.FC = () => {
     title: "",
     description: "",
     releaseDate: "",
+    hashtag: "",
     director: "",
     language: "",
     duration: 0,
@@ -28,6 +34,43 @@ const AdminMovieManagementPage: React.FC = () => {
     m.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+
+  const handleAddHashtag = () => {
+    const input = formData.hashtag.trim();
+    if (!input) {
+      setFormErrors({ hashtag: "Error" });
+      return;
+    }
+
+    const newTags = input
+      .split(/[\s,]+/)
+      .map(tag => (tag.startsWith('#') ? tag : `#${tag}`))
+      .filter(tag => tag.length > 1 && !hashtags.includes(tag));
+
+    if (newTags.length === 0) {
+      setFormErrors({ hashtag: "Error" });
+      return;
+    }
+
+    setHashtags(prev => [...prev, ...newTags]);
+    setFormData({ ...formData, hashtag: '' });
+    setFormErrors({ hashtag: "false" });
+  };
+
+  const handleDeleteHashtag = (tagToDelete: any) => {
+    setHashtags(prev => prev.filter(tag => tag !== tagToDelete));
+    setSelectedGenres(prev => prev.filter(tag => tag !== tagToDelete));
+  };
+
+  useEffect(() =>{
+    fetchGenres()
+    .then(data => {
+      // console.log(data.data);
+      setgenres(data.data);
+    })
+    .catch(err => console.error(err));
+  },[])
+
   useEffect(() => {
     fetchMovies()
       .then(data => setMovies(data.movies))
@@ -39,6 +82,7 @@ const AdminMovieManagementPage: React.FC = () => {
       title: "",
       description: "",
       releaseDate: '',
+      hashtag: "",
       director: "",
       duration: 0,
       language: "",
@@ -60,8 +104,6 @@ const AdminMovieManagementPage: React.FC = () => {
     if (!formData.releaseDate.trim()) {
       errors.releaseDate = 'Release date is required';
     }
-    if (!formData.rating || isNaN(Number(formData.rating)) || Number(formData.rating) < 0 || Number(formData.rating) > 10)
-      errors.rating = 'Rating must be between 0 and 10';
     if (!formData.language.trim()) errors.language = 'Language is required';
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -91,7 +133,12 @@ const AdminMovieManagementPage: React.FC = () => {
 
   const handleDeleteClick = (id: string) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa phim này?')) {
-      setMovies(prev => prev?.filter(m => m.id !== id) || null);
+      DeleteMovie(id).then(res => {
+        setMovies(prev => prev?.filter(m => m.id !== id) || null);
+      })
+      .catch(err => {
+        console.log(err);
+      })
     }
   };
 
@@ -104,13 +151,14 @@ const AdminMovieManagementPage: React.FC = () => {
       title: formData.title,
       description: formData.description,
       releaseDate: formData.releaseDate,
+      hashtag: formData.hashtag,
       director: formData.director,
       duration: formData.duration,
       language: formData.language,
-      posterUrl: formData.posterUrl,
-      rating: formData.rating,
+      posterUrl: '',
+      rating: 0,
       isActive: formData.isActive,
-      genres: formData.genres,
+      genres: (genres?.filter((genre) => selectedGenres.includes(genre.id.toString()))) || [],
       videoUrl: "", // nếu có trường này
     };
 
@@ -120,6 +168,7 @@ const AdminMovieManagementPage: React.FC = () => {
         setMovies(prev => prev?.map(m => m.id === editingMovie.id ? movieData : m) || null);
       } else {
         // Add movie
+        console.log(movieData);
         setMovies(prev => prev ? [...prev, movieData] : [movieData]);
         AddMovie(movieData).then(data => {
           console.log(data);
@@ -131,8 +180,6 @@ const AdminMovieManagementPage: React.FC = () => {
       console.error(error);
     }
   };
-
-
 
   return (
     <div style={styles.pageContainer}>
@@ -174,7 +221,7 @@ const AdminMovieManagementPage: React.FC = () => {
               filteredMovies?.map(movie => (
                 <tr key={movie.id} onClick={(e) => {
                 if ((e.target as HTMLElement).tagName.toLowerCase() !== 'button') {
-                    window.location.href = `/9710010910511011297103101/movies/${movie.id}/episodes`;
+                    window.location.href = `/movie/${movie.id}`;
                 }
                 }}>
                     <td style={styles.td}>{movie.title}</td>
@@ -218,23 +265,112 @@ const AdminMovieManagementPage: React.FC = () => {
               />
               {formErrors.title && <span style={styles.error}>{formErrors.title}</span>}
 
-              <label style={styles.label}>Genres (comma separated)</label>
+              <label style={styles.label}>Director</label>
               <input
                 type="text"
-                placeholder="e.g. Action, Sci-Fi"
-                value={formData.genres.map(g => g.name).join(', ')}
-                onChange={(e) => {
-                  const genreNames = e.target.value.split(',').map(name => name.trim()).filter(Boolean);
-                  setFormData(prev => ({
-                    ...prev,
-                    genres: genreNames.map((name, idx) => ({ id: idx + 1, name })),
-                  }));
-                  setFormErrors(prev => ({ ...prev, genres: '' }));
-                }}
-                style={{ ...styles.input, borderColor: formErrors.genres ? '#f44336' : '#ccc' }}
+                name="director"
+                value={formData.director}
+                onChange={handleInputChange}
+                style={{ ...styles.input, borderColor: formErrors.director ? '#f44336' : '#ccc' }}
+                autoFocus
               />
-              {formErrors.genres && <span style={styles.error}>{formErrors.genres}</span>}
+              {formErrors.director && <span style={styles.error}>{formErrors.director}</span>}
 
+              <label style={styles.label}>Duration</label>
+              <input
+                type="text"
+                name="duration"
+                value={formData.duration}
+                onChange={handleInputChange}
+                style={{ ...styles.input, borderColor: formErrors.duration ? '#f44336' : '#ccc' }}
+                autoFocus
+              />
+              {formErrors.duration && <span style={styles.error}>{formErrors.duration}</span>}
+
+              <label style={styles.label}>Genres</label>
+              <select
+                multiple
+                value={selectedGenres}
+                onChange={(e) => {
+                  const selected = Array.from(e.target.selectedOptions, (option) => option.value);
+                  setSelectedGenres(selected);
+                }}
+              >
+                {genres?.map((genre) => (
+                  <option key={genre.id} value={genre.id}>
+                    {genre.name}
+                  </option>
+                ))}
+              </select>
+              {formErrors.genre && <span style={styles.error}>{formErrors.genre}</span>}
+
+              <div>
+                <label style={styles.label}>Hash Tag</label>
+                <input
+                  type="text"
+                  name="hashtag"
+                  value={formData.hashtag}
+                  onChange={handleInputChange}
+                  style={{
+                    padding: '8px',
+                    borderColor: formErrors.hashtag ? '#f44336' : '#ccc',
+                    borderWidth: 1,
+                    borderStyle: 'solid',
+                    borderRadius: 4,
+                    width: 300,
+                    marginRight: 10,
+                  }}
+                  placeholder="Nhập hashtag rồi nhấn Add"
+                />
+                <button onClick={handleAddHashtag}>Add HashTag</button>
+
+                <div style={{ marginTop: 10 }}>
+                  <label>Danh sách hashtag đã thêm:</label><br />
+                  <select
+                    multiple
+                    onChange={(e) => {
+                      const selected = Array.from(e.target.selectedOptions, (option) => option.value);
+                      setSelectedGenres(selected);
+                    }}
+                    style={{ width: 300, height: 100 }}
+                  >
+                    {hashtags.map(tag => (
+                      <option key={tag} value={tag}>
+                        {tag}
+                      </option>
+                    ))}
+                  </select>
+
+                  <div style={{ marginTop: 10 }}>
+                    {hashtags.map(tag => (
+                      <span
+                        key={tag}
+                        style={{
+                          display: 'inline-block',
+                          marginRight: 8,
+                          background: '#eee',
+                          padding: '4px 8px',
+                          borderRadius: 12,
+                        }}
+                      >
+                        {tag}{' '}
+                        <button
+                          onClick={() => handleDeleteHashtag(tag)}
+                          style={{
+                            border: 'none',
+                            background: 'transparent',
+                            cursor: 'pointer',
+                            color: '#f44336',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          x
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
               <label style={styles.label}>Release Date</label>
               <input
                 type="date"
@@ -245,19 +381,6 @@ const AdminMovieManagementPage: React.FC = () => {
               />
 
               {formErrors.year && <span style={styles.error}>{formErrors.year}</span>}
-
-              <label style={styles.label}>Rating (0 - 10)</label>
-              <input
-                type="number"
-                name="rating"
-                value={formData.rating}
-                onChange={handleInputChange}
-                style={{ ...styles.input, borderColor: formErrors.rating ? '#f44336' : '#ccc' }}
-                min={0}
-                max={10}
-                step={0.1}
-              />
-              {formErrors.rating && <span style={styles.error}>{formErrors.rating}</span>}
 
               <label style={styles.label}>Language</label>
               <input
@@ -391,8 +514,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundColor: 'rgba(0,0,0,0.5)',
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     zIndex: 1000,
+    overflowY: "auto",
+    paddingRight: "10px",
   },
   modal: {
     backgroundColor: 'white',
