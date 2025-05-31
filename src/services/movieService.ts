@@ -23,7 +23,8 @@ export const AddMovie = async (data: Partial<Movie>): Promise<MovieResponse> => 
     posterUrl: data.posterUrl,
     rating: data.rating,
     isActive: data.isActive,
-    // genres: data.genres, // nếu có
+    genres: data.genres, // nếu có
+    hashtags: data.hashtags,
   });
   return res.data;
 };

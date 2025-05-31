@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AddMovie, DeleteMovie, fetchMovies } from '../../services/movieService';
-import { Genre, Movie } from '../../types/movie';
+import { Genre, Hashtag, Movie } from '../../types/movie';
 import { v4 as uuidv4 } from 'uuid';
 import { json } from 'stream/consumers';
 import { fetchGenres } from '../../services/genreservices';
@@ -8,26 +8,27 @@ import Select from 'react-select';
 
 const AdminMovieManagementPage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[] | null>(null);
-  const [genres, setgenres] = useState<Genre[] | null>(null);  
-  const [hashtags, setHashtags] = useState<string[]>([]);
-  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    releaseDate: "",
-    hashtag: "",
-    director: "",
-    language: "",
-    duration: 0,
-    posterUrl: "",
-    rating: 0,
-    isActive: true,
-    genres: [] as Genre[],
-  });
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+
+  const [title, settitle] = useState('');
+  const [description, setdescription] = useState('');
+  const [posterUrl, setposterUrl] = useState('');
+  const [director, setdirector] = useState('');
+  const [duration, setduration] = useState(0);
+  const [language, setlanguage] = useState('');
+  const [videoUrl, setvideoUrl] = useState('');
+  const [rating, setrating] = useState(0);
+  const [isActive, setisActive] = useState(true);
+  const [releaseDate, setreleaseDate] = useState('');
+  const [selectedGenres, setSelectedGenres] = useState<string[] | null>(null);
+  const [genres, setgenres] = useState<Genre[] | null>(null);  
+  const [hashtag, setHashtag] = useState<string | null>('');
+  const [hashtagInput, setHashtagInput] = useState("");
+  const [selectedHashtag, setselectedHashtag] = useState<string[] | null>(null);
+  const [hashtags, setHashtags] = useState<Hashtag[]>([]);
 
   // Filtered movies by search
   const filteredMovies = movies?.filter(m =>
@@ -35,31 +36,34 @@ const AdminMovieManagementPage: React.FC = () => {
   );
 
 
-  const handleAddHashtag = () => {
-    const input = formData.hashtag.trim();
-    if (!input) {
-      setFormErrors({ hashtag: "Error" });
+  const handleAddHashtag = (/*e: React.FormEvent*/) => {
+    // e.preventDefault();
+
+    const trimmedInput = hashtagInput.trim();
+    if (trimmedInput === "") {
+      setFormErrors({ hashtag: "Hashtag không được để trống" });
       return;
     }
 
-    const newTags = input
-      .split(/[\s,]+/)
-      .map(tag => (tag.startsWith('#') ? tag : `#${tag}`))
-      .filter(tag => tag.length > 1 && !hashtags.includes(tag));
+    const newTag = { name: trimmedInput };
 
-    if (newTags.length === 0) {
-      setFormErrors({ hashtag: "Error" });
+    // Nếu hashtags có thể null thì cần kiểm tra
+    if (hashtags === null) {
+      setHashtags([newTag]);
+    } else if (!hashtags.some(tag => tag.name === trimmedInput)) {
+      setHashtags([...hashtags, newTag]);
+    } else {
+      setFormErrors({ hashtag: "Hashtag đã tồn tại" });
       return;
     }
 
-    setHashtags(prev => [...prev, ...newTags]);
-    setFormData({ ...formData, hashtag: '' });
-    setFormErrors({ hashtag: "false" });
+    setHashtagInput(""); // reset input
+    setFormErrors({ ...formErrors, hashtag: "" }); // xóa lỗi nếu có
   };
+
 
   const handleDeleteHashtag = (tagToDelete: any) => {
     setHashtags(prev => prev.filter(tag => tag !== tagToDelete));
-    setSelectedGenres(prev => prev.filter(tag => tag !== tagToDelete));
   };
 
   useEffect(() =>{
@@ -69,7 +73,7 @@ const AdminMovieManagementPage: React.FC = () => {
       setgenres(data.data);
     })
     .catch(err => console.error(err));
-  },[])
+  },[genres]);
 
   useEffect(() => {
     fetchMovies()
@@ -78,19 +82,15 @@ const AdminMovieManagementPage: React.FC = () => {
   }, []);
 
   const resetForm = () => {
-    setFormData({ 
-      title: "",
-      description: "",
-      releaseDate: '',
-      hashtag: "",
-      director: "",
-      duration: 0,
-      language: "",
-      posterUrl: "",
-      rating: 0,
-      isActive: true,
-      genres: [],
-    });
+    settitle('');
+    setdescription('');
+    setdirector('');
+    setHashtag('');
+    setduration(0);
+    setgenres([]);
+    setposterUrl('');
+    setreleaseDate('');
+    setvideoUrl('');
     setFormErrors({});
     setEditingMovie(null);
     setIsEditing(false);
@@ -98,20 +98,10 @@ const AdminMovieManagementPage: React.FC = () => {
 
   const validateForm = () => {
     const errors: { [key: string]: string } = {};
-    if (!formData.title.trim()) errors.title = 'Title is required';
-    if (!formData.genres || formData.genres.length === 0)
-      errors.genres = 'Genres are required';
-    if (!formData.releaseDate.trim()) {
-      errors.releaseDate = 'Release date is required';
-    }
-    if (!formData.language.trim()) errors.language = 'Language is required';
+    // if (!formData.genres || formData.genres.length === 0)
+    //   errors.genres = 'Genres are required';
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-    setFormErrors(prev => ({ ...prev, [e.target.name]: '' }));
   };
 
   const handleAddClick = () => {
@@ -148,17 +138,17 @@ const AdminMovieManagementPage: React.FC = () => {
 
     const movieData: Movie = {
       id: editingMovie ? editingMovie.id : uuidv4(),
-      title: formData.title,
-      description: formData.description,
-      releaseDate: formData.releaseDate,
-      hashtag: formData.hashtag,
-      director: formData.director,
-      duration: formData.duration,
-      language: formData.language,
+      title: title,
+      description: description,
+      releaseDate: releaseDate,
+      hashtags: hashtags!,
+      director: director,
+      duration: duration,
+      language: language,
       posterUrl: '',
       rating: 0,
-      isActive: formData.isActive,
-      genres: (genres?.filter((genre) => selectedGenres.includes(genre.id.toString()))) || [],
+      isActive: isActive,
+      genres:  (genres?.filter((genre) => selectedGenres!.includes(genre.id.toString()))) || [],
       videoUrl: "", // nếu có trường này
     };
 
@@ -168,7 +158,7 @@ const AdminMovieManagementPage: React.FC = () => {
         setMovies(prev => prev?.map(m => m.id === editingMovie.id ? movieData : m) || null);
       } else {
         // Add movie
-        console.log(movieData);
+        //console.log(movieData);
         setMovies(prev => prev ? [...prev, movieData] : [movieData]);
         AddMovie(movieData).then(data => {
           console.log(data);
@@ -258,8 +248,10 @@ const AdminMovieManagementPage: React.FC = () => {
               <input
                 type="text"
                 name="title"
-                value={formData.title}
-                onChange={handleInputChange}
+                value={title}
+                onChange={(e) => {
+                  settitle(e.target.value);
+                }}
                 style={{ ...styles.input, borderColor: formErrors.title ? '#f44336' : '#ccc' }}
                 autoFocus
               />
@@ -269,8 +261,10 @@ const AdminMovieManagementPage: React.FC = () => {
               <input
                 type="text"
                 name="director"
-                value={formData.director}
-                onChange={handleInputChange}
+                value={director}
+                onChange={(e) => {
+                  setdirector(e.target.value);
+                }}
                 style={{ ...styles.input, borderColor: formErrors.director ? '#f44336' : '#ccc' }}
                 autoFocus
               />
@@ -278,10 +272,13 @@ const AdminMovieManagementPage: React.FC = () => {
 
               <label style={styles.label}>Duration</label>
               <input
-                type="text"
+                type="number"
                 name="duration"
-                value={formData.duration}
-                onChange={handleInputChange}
+                value={duration}
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+                  if (!isNaN(value)) setduration(value);
+                }}
                 style={{ ...styles.input, borderColor: formErrors.duration ? '#f44336' : '#ccc' }}
                 autoFocus
               />
@@ -290,7 +287,7 @@ const AdminMovieManagementPage: React.FC = () => {
               <label style={styles.label}>Genres</label>
               <select
                 multiple
-                value={selectedGenres}
+                value={selectedGenres!}
                 onChange={(e) => {
                   const selected = Array.from(e.target.selectedOptions, (option) => option.value);
                   setSelectedGenres(selected);
@@ -309,8 +306,10 @@ const AdminMovieManagementPage: React.FC = () => {
                 <input
                   type="text"
                   name="hashtag"
-                  value={formData.hashtag}
-                  onChange={handleInputChange}
+                  value={hashtagInput}
+                  onChange={(e) => {
+                    setHashtagInput(e.target.value); // chỉ thay đổi input hiện tại
+                  }}
                   style={{
                     padding: '8px',
                     borderColor: formErrors.hashtag ? '#f44336' : '#ccc',
@@ -322,21 +321,22 @@ const AdminMovieManagementPage: React.FC = () => {
                   }}
                   placeholder="Nhập hashtag rồi nhấn Add"
                 />
-                <button onClick={handleAddHashtag}>Add HashTag</button>
+                <button type="button" onClick={handleAddHashtag}>Add HashTag</button>
 
                 <div style={{ marginTop: 10 }}>
                   <label>Danh sách hashtag đã thêm:</label><br />
                   <select
                     multiple
                     onChange={(e) => {
+                      e.preventDefault();
                       const selected = Array.from(e.target.selectedOptions, (option) => option.value);
-                      setSelectedGenres(selected);
+                      setselectedHashtag(selected);
                     }}
                     style={{ width: 300, height: 100 }}
                   >
                     {hashtags.map(tag => (
-                      <option key={tag} value={tag}>
-                        {tag}
+                      <option key={tag.name} value={tag.name}>
+                        {tag.name}
                       </option>
                     ))}
                   </select>
@@ -344,7 +344,7 @@ const AdminMovieManagementPage: React.FC = () => {
                   <div style={{ marginTop: 10 }}>
                     {hashtags.map(tag => (
                       <span
-                        key={tag}
+                        key={tag.name}
                         style={{
                           display: 'inline-block',
                           marginRight: 8,
@@ -353,9 +353,9 @@ const AdminMovieManagementPage: React.FC = () => {
                           borderRadius: 12,
                         }}
                       >
-                        {tag}{' '}
+                        {tag.name}{' '}
                         <button
-                          onClick={() => handleDeleteHashtag(tag)}
+                          onClick={() => handleDeleteHashtag(tag.name)}
                           style={{
                             border: 'none',
                             background: 'transparent',
@@ -375,8 +375,10 @@ const AdminMovieManagementPage: React.FC = () => {
               <input
                 type="date"
                 name="releaseDate"
-                value={formData.releaseDate}
-                onChange={handleInputChange}
+                value={releaseDate}
+                onChange={(e) => {
+                  setreleaseDate(e.target.value);
+                }}
                 style={{ ...styles.input, borderColor: formErrors.releaseDate ? '#f44336' : '#ccc' }}
               />
 
@@ -386,8 +388,10 @@ const AdminMovieManagementPage: React.FC = () => {
               <input
                 type="text"
                 name="language"
-                value={formData.language}
-                onChange={handleInputChange}
+                value={language}
+                onChange={(e) => {
+                  setlanguage(e.target.value);
+                }}
                 style={{ ...styles.input, borderColor: formErrors.language ? '#f44336' : '#ccc' }}
               />
               {formErrors.language && <span style={styles.error}>{formErrors.language}</span>}
@@ -395,8 +399,10 @@ const AdminMovieManagementPage: React.FC = () => {
               <label style={styles.label}>Description</label>
               <textarea
                 name="description"
-                value={formData.description}
-                onChange={handleInputChange}
+                value={description}
+                onChange={(e) => {
+                  setdescription(e.target.value);
+                }}
                 style={styles.input}
               />
 

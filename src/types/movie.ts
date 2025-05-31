@@ -3,7 +3,7 @@ export interface Movie {
   title: string;
   description: string;
   posterUrl: string;
-  hashtag: string
+  hashtags: Hashtag[];
   director?: string;
   duration?: number
   language?: string;
@@ -14,6 +14,13 @@ export interface Movie {
   genres: Genre[];
 }
   
+
+export interface Hashtag {
+  id?: number;
+  name?: string;
+  movies?: Movie[];
+}
+
 
 export interface Genre {
   id: number;
