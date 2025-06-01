@@ -27,16 +27,26 @@ const Header = () => {
 
     return (
       <header className="header">
-        <Link to="/" className="logo">Movie App</Link>
-        <nav>
-        <Link to="/">Trang chủ</Link>
-        <Link to="/about">Giới thiệu</Link>
+      <nav className="nav">
+        <Link to="/" className="logo">Sieu Nhan</Link>
+        <div>
+          <div className="menu-item">
+            <Link to="/">Trang chủ</Link>
+            <Link to="/about">Giới thiệu</Link>
+            <ul className="dropdown">
+              <li><Link className="dropdown-item" to="/searchAll">Tìm kiếm</Link></li>
+              <li><Link className="dropdown-item" to="/top-movies">Phim hay</Link></li>
+            </ul>
+          </div>
+          
+          
+          {user ? (
+            <Link to="/profile">Xin chào, {user.username}</Link>
+          ) : (
+            <Link to="/login">Đăng nhập</Link>
+          )}
+        </div>
         
-        {user ? (
-          <Link to="/profile">Xin chào, {user.username}</Link>
-        ) : (
-          <Link to="/login">Đăng nhập</Link>
-        )}
       </nav>
       </header>
     );

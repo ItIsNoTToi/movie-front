@@ -51,6 +51,16 @@ const AdminPage: React.FC = () => {
             <li style={styles.navItem} onClick={() => navigation('/9710010910511011297103101')}>Dashboard</li>
             <li style={styles.navItem}>
               <a 
+                href="/9710010910511011297103101/categories" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{ color: 'inherit', textDecoration: 'none' }}
+              >
+                Categories
+              </a>
+            </li>
+            <li style={styles.navItem}>
+              <a 
                 href="/9710010910511011297103101/movies" 
                 target="_blank" 
                 rel="noopener noreferrer"

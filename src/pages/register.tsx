@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useAuth from '../hooks/useAuth';
 
 interface FormData {
   fullName: string;
@@ -10,6 +11,14 @@ interface FormData {
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate('/profile');
+      return;
+    }
+  }, [isLoggedIn, navigate])
 
   const [formData, setFormData] = useState<FormData>({
     fullName: '',

@@ -11,24 +11,39 @@ import NotFoundPage from "../pages/Error";
 import RegisterPage from "../pages/register";
 import AdminMovieManagementPage from "../pages/Admin/movie_dashboard";
 import AdminEpisodeManagementPage from "../pages/Admin/episodes_dashboard";
-
+import SearchAll from "../pages/searchAll";
 
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<Home />} />
     <Route path="/movie/:id" element={<MovieDetail />} />
     <Route path="/movie/:id/:episode" element={<Watch />} />
-    
     <Route path="/profile" element={<ProfilePage />} />
-    <Route path="/9710010910511011297103101" element={<RequireAdmin />}>
-      <Route index element={<Dashboard />} />
-      <Route path="movies" element={<AdminMovieManagementPage />} />
-      <Route path="movies/:movieId/episodes" element={<AdminEpisodeManagementPage />} />
-    </Route>
+    <Route path="/searchAll" element={<SearchAll />} />
+    {/* Render các route quản trị */}
+    {AdminRoutes()}
+    {/* Route đăng nhập/đăng ký */}
+    {AccountRoutes()}
     <Route path="*" element={<NotFoundPage />} />
-    <Route path="/login" element={<LoginPage />} />
-    <Route path="/register" element={<RegisterPage />} />
   </Routes>
 );
+
+
+export const AdminRoutes = () => (
+  <Route path="/9710010910511011297103101" element={<RequireAdmin />}>
+    <Route index element={<Dashboard />} />
+    <Route path="categories" element={<AdminMovieManagementPage />} />
+    <Route path="movies" element={<AdminMovieManagementPage />} />
+    <Route path="movies/:movieId/episodes" element={<AdminEpisodeManagementPage />} />
+  </Route>
+);
+
+export const AccountRoutes = () => (
+  <>
+    <Route path="/login" element={<LoginPage />} />
+    <Route path="/register" element={<RegisterPage />} />
+  </>
+);
+
 
 export default AppRoutes;
