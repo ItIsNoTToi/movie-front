@@ -12,6 +12,7 @@ import RegisterPage from "../pages/register";
 import AdminMovieManagementPage from "../pages/Admin/movie_dashboard";
 import AdminEpisodeManagementPage from "../pages/Admin/episodes_dashboard";
 import SearchAll from "../pages/searchAll";
+import AdminCategoriesManagementPage from "../pages/Admin/categories_dashboard";
 
 const AppRoutes = () => (
   <Routes>
@@ -32,7 +33,7 @@ const AppRoutes = () => (
 export const AdminRoutes = () => (
   <Route path="/9710010910511011297103101" element={<RequireAdmin />}>
     <Route index element={<Dashboard />} />
-    <Route path="categories" element={<AdminMovieManagementPage />} />
+    <Route path="categories" element={<AdminCategoriesManagementPage />} />
     <Route path="movies" element={<AdminMovieManagementPage />} />
     <Route path="movies/:movieId/episodes" element={<AdminEpisodeManagementPage />} />
   </Route>

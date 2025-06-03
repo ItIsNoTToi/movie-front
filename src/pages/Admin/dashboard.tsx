@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getaccount } from '../../services/adminservices';
 
 interface CardProps {
   title: string;
@@ -21,24 +22,28 @@ const Card: React.FC<CardProps> = ({ title, value, icon }) => {
 
 interface User {
   id: number;
-  name: string;
+  username: string;
   email: string;
-  role: string;
-  status: string;
+  admin: {
+    role: string;
+  };
+  isActived: boolean;
 }
 
-const initialUsers: User[] = [
-  { id: 1, name: 'Alice Johnson', email: 'alice@example.com', role: 'Admin', status: 'Active' },
-  { id: 2, name: 'Bob Smith', email: 'bob@example.com', role: 'Editor', status: 'Inactive' },
-  { id: 3, name: 'Charlie Lee', email: 'charlie@example.com', role: 'Viewer', status: 'Active' },
-];
+
+
 
 const AdminPage: React.FC = () => {
   const navigation = useNavigate();
-  const [users, setUsers] = useState<User[]>(initialUsers);
+  const [users, setUsers] = useState<User[]>([]);
+
+  useEffect(() =>{
+    getaccount()
+    .then(data => setUsers(data.account))
+  },[])
 
   const role = JSON.parse(localStorage.getItem("role") || "{}");
-  if(role != 'Admin'){
+  if(role !== 'Admin'){
     return <div>Cut </div>
   }
   else
@@ -81,7 +86,7 @@ const AdminPage: React.FC = () => {
         </header>
         <section style={styles.cardsContainer}>
           <Card title="Total Users" value={users.length} />
-          <Card title="Active Users" value={users.filter(u => u.status === 'Active').length} />
+          <Card title="Active Users" value={users.filter(u => u.isActived === true).length} />
           <Card title="Pending Tasks" value={5} />
         </section>
         <section>
@@ -100,18 +105,18 @@ const AdminPage: React.FC = () => {
               {users.map(user => (
                 <tr key={user.id} style={styles.tr}>
                   <td style={styles.td}>{user.id}</td>
-                  <td style={styles.td}>{user.name}</td>
+                  <td style={styles.td}>{user.username}</td>
                   <td style={styles.td}>{user.email}</td>
-                  <td style={styles.td}>{user.role}</td>
+                  <td style={styles.td}>{user.admin.role}</td>
                   <td style={styles.td}>
                     <span
                       style={{
                         ...styles.statusBadge,
                         backgroundColor:
-                          user.status === 'Active' ? '#4caf50' : '#f44336',
+                          user.isActived === true ? '#4caf50' : '#f44336',
                       }}
                     >
-                      {user.status}
+                      {user.isActived}
                     </span>
                   </td>
                 </tr>
