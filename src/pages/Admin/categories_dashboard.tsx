@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { AddMovie, DeleteMovie, fetchMovies } from '../../services/movieService';
-import { Genre, Hashtag, Movie } from '../../types/movie';
-import { v4 as uuidv4 } from 'uuid';
-import { json } from 'stream/consumers';
+import { Genre } from '../../types/movie';
 import { fetchGenres } from '../../services/genreservices';
-import Select from 'react-select';
 
 const AdminCategoriesManagementPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');

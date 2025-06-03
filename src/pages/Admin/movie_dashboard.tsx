@@ -12,7 +12,6 @@ const AdminMovieManagementPage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
-
   const [title, settitle] = useState('');
   const [description, setdescription] = useState('');
   const [posterUrl, setposterUrl] = useState('');
