@@ -4,6 +4,7 @@ import axios from "../axiosConfig";
 import './MovieDetail.css';
 import { v4 as uuidv4 } from 'uuid';
 import { AddEpisode, convertToMySQLDate, deleteEpisode, EditEpisode } from "../services/episodeService";
+import { Genre, Hashtag } from "../types/movie";
 
 type EpisodeType = {
   id: number;
@@ -21,6 +22,8 @@ type MovieDetailType = {
   releaseDate: string;
   posterUrl: string;
   episodes: EpisodeType[];
+  genres: Genre[];
+  hashtags: Hashtag[];
 };
 
 const MovieDetail = () => {
@@ -156,6 +159,8 @@ const MovieDetail = () => {
         <div style={{ padding: 10, }}>
           <p className="movie-description">{movie.description}</p>
           <p className="movie-release-date">Release Date: {movie.releaseDate}</p>
+          <p className="" style={{ color: 'black', }}>Genres: {movie.genres?.map(a => a.name).join(',')}</p>
+          <p className="" style={{ color: 'black', }}>Hashtags: {movie.hashtags?.map(a => a.name).join(',')}</p>
         </div>
         <div></div>
       </div>

@@ -1,20 +1,51 @@
-import React, { useEffect, useState } from 'react';
-import { fetchGenres } from '../services/genreservices';
-import { searchItems } from '../services/movieService';
-import { Movie } from '../types/movie';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
 
-interface Genre {
-  id: number;
-  name: string;
-}
+const sampleData = [
+  {
+    id: 1,
+    name: 'React Basics',
+    category: 'Programming',
+    hashtags: ['#react', '#javascript', '#frontend'],
+    releaseDate: '2022-01-15',
+    author: 'John Doe',
+  },
+  {
+    id: 2,
+    name: 'Advanced React Patterns',
+    category: 'Programming',
+    hashtags: ['#react', '#patterns'],
+    releaseDate: '2023-03-10',
+    author: 'Jane Smith',
+  },
+  {
+    id: 3,
+    name: 'Cooking Tips',
+    category: 'Lifestyle',
+    hashtags: ['#cooking', '#food', '#tips'],
+    releaseDate: '2021-11-25',
+    author: 'Chef Alex',
+  },
+  {
+    id: 4,
+    name: 'Photography 101',
+    category: 'Art',
+    hashtags: ['#photography', '#art'],
+    releaseDate: '2022-05-05',
+    author: 'Emily Clark',
+  },
+  {
+    id: 5,
+    name: 'React Hooks Deep Dive',
+    category: 'Programming',
+    hashtags: ['#react', '#hooks', '#javascript'],
+    releaseDate: '2024-05-20',
+    author: 'Mark Antonio',
+  },
+];
+
+const categories = ['All', 'Programming', 'Lifestyle', 'Art'];
 
 const SearchAll: React.FC  = () => {
-
-  const [items, setItems] = useState<Movie[]>([]); // hoặc [] nếu không dùng dữ liệu mẫu
-  const [loading, setLoading] = useState(false);
-  const [genre, setgenre] = useState<Genre[] | null>(null);
-
   const [filters, setFilters] = useState({
     category: 'All',
     hashtag: '',
@@ -22,28 +53,6 @@ const SearchAll: React.FC  = () => {
     releaseDate: '',
     author: '',
   });
-
-  const buildFilterPayload = () => {
-    return {
-      ...(filters.category !== 'All' && { category: filters.category }),
-      ...(filters.hashtag.trim() && { hashtag: filters.hashtag }),
-      ...(filters.name.trim() && { name: filters.name }),
-      ...(filters.releaseDate.trim() && { releaseDate: filters.releaseDate }),
-      ...(filters.author.trim() && { author: filters.author }),
-    };
-  };
-  
-  const fetchFilteredItems = async () => {
-    setLoading(true);
-    try {
-      const res = await searchItems(buildFilterPayload()); // Gửi toàn bộ filters
-      setItems(res.data); // Server trả về danh sách item mới
-    } catch (error) {
-      console.error('Error fetching filtered items:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
@@ -53,42 +62,66 @@ const SearchAll: React.FC  = () => {
     }));
   };
 
-  useEffect(() => {
-    fetchGenres()
-    .then(data => {
-      setgenre(data.data);
-    })
-  },[]);
+  const filterItems = () => {
+    return sampleData.filter((item) => {
+      // Category filter
+      if (filters.category !== 'All' && item.category !== filters.category) {
+        return false;
+      }
+      // Hashtag filter (case-insensitive, match any hashtag includes the search)
+      if (
+        filters.hashtag &&
+        !item.hashtags.some((tag) =>
+          tag.toLowerCase().includes(filters.hashtag.toLowerCase())
+        )
+      ) {
+        return false;
+      }
+      // Name filter (case-insensitive substring)
+      if (
+        filters.name &&
+        !item.name.toLowerCase().includes(filters.name.toLowerCase())
+      ) {
+        return false;
+      }
+      // Release date filter (YYYY-MM-DD)
+      if (filters.releaseDate && item.releaseDate !== filters.releaseDate) {
+        return false;
+      }
+      // Author filter (case-insensitive substring)
+      if (
+        filters.author &&
+        !item.author.toLowerCase().includes(filters.author.toLowerCase())
+      ) {
+        return false;
+      }
+      return true;
+    });
+  };
 
-  useEffect(() => {
-    fetchFilteredItems();
-    
-  }, [filters]);
+  const filteredItems = filterItems();
 
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>Search All</h1>
       <div style={styles.filterBox}>
         <div style={styles.filterGroup}>
-          <label htmlFor="genre" style={styles.label}>
-            Genres
+          <label htmlFor="category" style={styles.label}>
+            Category
           </label>
           <select
-            id="genre"
-            name="genre"
+            id="category"
+            name="category"
             value={filters.category}
             onChange={handleChange}
             style={styles.select}
           >
-            <option value="All">All</option>
-            {genre?.map((item) => (
-              <option key={item.id} value={item.name}>
-                {item.name}
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
               </option>
             ))}
-
           </select>
-
         </div>
         <div style={styles.filterGroup}>
           <label htmlFor="hashtag" style={styles.label}>
@@ -148,19 +181,15 @@ const SearchAll: React.FC  = () => {
       </div>
 
       <div style={styles.results}>
-        {loading ? (
-          <p>Loading...</p>
-        ) : items.length > 0 ? (
-          items.map((item) => (
-            <Link to={`/movie/${item.id}`} style={{ textDecoration: 'none', }} key={item.id} >
-              <div style={styles.card}>
-                <h3 style={styles.itemName}>{item.title}</h3>
-                <p><strong>Genres:</strong> {Array.isArray(item.genres) ? item.genres.map(g => g.name).join(', ') : 'No genres'}</p>
-                <p><strong>Hashtags:</strong> {Array.isArray(item.hashtags) ? item.hashtags.map(h => h.name).join(', ') : 'No hashtags'}</p>
-                <p><strong>Release Date:</strong> {item.releaseDate}</p>
-                <p><strong>Author:</strong> {item.director}</p>
-              </div>
-            </Link>
+        {filteredItems.length > 0 ? (
+          filteredItems.map((item) => (
+            <div key={item.id} style={styles.card}>
+              <h3 style={styles.itemName}>{item.name}</h3>
+              <p><strong>Category:</strong> {item.category}</p>
+              <p><strong>Hashtags:</strong> {item.hashtags.join(' ')}</p>
+              <p><strong>Release Date:</strong> {item.releaseDate}</p>
+              <p><strong>Author:</strong> {item.author}</p>
+            </div>
           ))
         ) : (
           <p style={styles.noResults}>No results found.</p>

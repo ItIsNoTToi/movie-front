@@ -50,3 +50,10 @@ export const DeleteMovie = async (id: any): Promise<MovieResponse> => {
   const res = await axios.delete(`/9710010910511011297103101/deleteMovie/${id}`);
   return res.data;
 };
+
+
+export const searchItems = async (filters: any) => {
+  // console.log(filters);
+  const res = await axios.post('/findmovies', filters); 
+  return res.data; // Cập nhật URL nếu cần
+};

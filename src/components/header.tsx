@@ -28,14 +28,15 @@ const Header = () => {
     return (
       <header className="header">
       <nav className="nav">
-        <Link to="/" className="logo">Sieu Nhan</Link>
+        <Link to="/" className="logo">Siêu Nhân</Link>
         <div>
           <div className="menu-item">
             <Link to="/">Trang chủ</Link>
             <Link to="/about">Giới thiệu</Link>
             <ul className="dropdown">
               <li><Link className="dropdown-item" to="/searchAll">Tìm kiếm</Link></li>
-              <li><Link className="dropdown-item" to="/top-movies">Phim hay</Link></li>
+              <li><Link className="dropdown-item" to="/List-movie">Danh sach phim</Link></li>
+              <li><Link className="dropdown-item" to="/top-movie">Phim hay</Link></li>
             </ul>
           </div>
           

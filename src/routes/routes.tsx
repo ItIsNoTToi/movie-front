@@ -20,6 +20,8 @@ const AppRoutes = () => (
     <Route path="/movie/:id/:episode" element={<Watch />} />
     <Route path="/profile" element={<ProfilePage />} />
     <Route path="/searchAll" element={<SearchAll />} />
+    <Route path="/List-movie" element={<></>} />
+    <Route path="/top-movie" element={<></>} />
     {/* Render các route quản trị */}
     {AdminRoutes()}
     {/* Route đăng nhập/đăng ký */}
