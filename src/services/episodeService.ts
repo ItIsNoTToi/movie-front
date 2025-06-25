@@ -10,9 +10,17 @@ export const AddEpisode = async (data: any, movieId: any) =>{
     });
     return res.data;
 };
-export const updateEpisode = async (movieId: string, ep: Episode) => /* PUT */{};
+export const EditEpisode = async (data: any, movieId: any, epId: any) => /* PUT */{
+    // console.log(epId);
+    const res = await axios.post('/9710010910511011297103101/editEpisode',{
+        data: data,
+        movieId: movieId,
+        epId: epId,
+    });
+    return res.data;
+};
 export const deleteEpisode = async (epId: string, movieId: number) =>{
-    const res = await axios.delete(`/9710010910511011297103101/deleteEpisode/${movieId}/${epId}`);
+    const res = await axios.delete(`/9710010910511011297103101/${movieId}/${epId}`);
     return res.data;
 };
 

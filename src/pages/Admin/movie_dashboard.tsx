@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AddMovie, DeleteMovie, fetchMovies } from '../../services/movieService';
+import { AddMovie, DeleteMovie, fetchMovies, EditMovie } from '../../services/movieService';
 import { Genre, Hashtag, Movie } from '../../types/movie';
 import { v4 as uuidv4 } from 'uuid';
 import { json } from 'stream/consumers';
@@ -110,13 +110,19 @@ const AdminMovieManagementPage: React.FC = () => {
 
   const handleEditClick = (movie: Movie) => {
     setEditingMovie(movie);
-    // setFormData({
-    //   title: movie.title,
-    //   // genres: movie.genres.map(g => g.name).join(', '),
-    //   releaseDate: new Date(movie.releaseDate).getFullYear().toString(),
-    //   rating: movie.rating,
-    //   language: movie.language || '',
-    // });
+    settitle(movie.title);
+    setdescription(movie.description);
+    setdirector(movie.director ?? "");
+    setselectedHashtag(
+      (movie.hashtags ?? [])
+        .map(h => h.name)
+        .filter((name): name is string => name !== undefined)
+    );
+    setduration(movie.duration ?? 0);
+    setlanguage(movie.language ?? "");
+    setgenres(movie.genres);
+    setSelectedGenres(movie.genres.map(g => g.id.toString()));
+    setreleaseDate(movie.releaseDate);
     setIsEditing(true);
   };
 
@@ -155,12 +161,16 @@ const AdminMovieManagementPage: React.FC = () => {
       if (editingMovie) {
         // Update movie local
         setMovies(prev => prev?.map(m => m.id === editingMovie.id ? movieData : m) || null);
+        EditMovie(movieData)
+        .then(data => {
+          // console.log(data);
+        })
       } else {
         // Add movie
         //console.log(movieData);
         setMovies(prev => prev ? [...prev, movieData] : [movieData]);
         AddMovie(movieData).then(data => {
-          console.log(data);
+          // console.log(data);
         })
         
       }

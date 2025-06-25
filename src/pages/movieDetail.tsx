@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import axios from "../axiosConfig";
 import './MovieDetail.css';
 import { v4 as uuidv4 } from 'uuid';
-import { AddEpisode, convertToMySQLDate, deleteEpisode } from "../services/episodeService";
+import { AddEpisode, convertToMySQLDate, deleteEpisode, EditEpisode } from "../services/episodeService";
 
 type EpisodeType = {
   id: number;
@@ -25,6 +25,7 @@ type MovieDetailType = {
 
 const MovieDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const [epID, setepId] = useState<number>(0);
   const [title, setTitle] = useState<string>('');
   const [description, setdescription] = useState<string>('');
   const [episodeNumber, setepisodeNumber] = useState<number>(0);
@@ -67,6 +68,7 @@ const MovieDetail = () => {
   const editEP = async (epId: any) => {
     const ep = await listEpisode.find(e => e.id === epId);
     if (ep) {
+      setepId(ep.id);
       setTitle(ep.title); 
       setdescription(ep.description);
       setepisodeNumber(ep.episodeNumber);
@@ -102,7 +104,7 @@ const MovieDetail = () => {
     // if (!validateForm()) return;
 
     const epData: EpisodeType = {
-      id: a ? a.id : uuidv4(),
+      id: epID,
       title: title,
       description: description,
       episodeNumber: episodeNumber,
@@ -114,6 +116,11 @@ const MovieDetail = () => {
       if (a) {
         // Update movie local
         setlistEpisode(prev => prev?.map(m => m.id === a.id ? epData : m) || null);
+        await EditEpisode(epData, movie.id, epData.id)
+        .then(data => {
+          window.location.reload();
+          // console.log(data);
+        })
       } else {
         // Add movie
         //console.log(movieData);
