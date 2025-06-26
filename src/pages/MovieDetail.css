@@ -3,7 +3,7 @@
 /* Thêm các style chung */
 .movie-detail-container {
   padding: 20px;
-  background-color: #f9fafb;
+  background-color: linear-gradient(to right bottom,  rgb(19, 156, 241), rgba(185, 241, 19, 0.5));
 }
 
 .movie-title {

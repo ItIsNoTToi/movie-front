@@ -12,6 +12,7 @@ export interface Movie {
   isActive: boolean;
   releaseDate: string;
   genres: Genre[];
+  
 }
   
 

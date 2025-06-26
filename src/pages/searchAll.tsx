@@ -172,8 +172,9 @@ const SearchAll: React.FC  = () => {
 
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
-    maxWidth: '900px',
-    margin: '40px auto',
+    backgroundColor: 'rgba(185, 241, 19, 0.5)',
+    maxWidth: '1000px',
+    margin: '40px 10%',
     padding: '0 20px',
     fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
   },

@@ -146,7 +146,16 @@ const MovieDetail = () => {
         <h1 className="movie-title">{movie.title}</h1>
         {
           role === 'Admin' ?
-          <button style={{width:'100px', height: '30px', justifyContent: "center", alignItems: 'center',}} onClick={ModeEdit}>Admin Mode</button>:
+          <button style={{
+            width: '100px',
+            height: '30px',
+            display: 'flex', // Bắt buộc để dùng justifyContent + alignItems
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: '7px',
+            border: 'none', // thay vì borderWidth
+            boxShadow: '0px 1px 2px 3px blue' // bỏ "inherit"
+          }} onClick={ModeEdit}>Admin Mode</button>:
           <div></div>
         }
         <div></div>
@@ -167,7 +176,17 @@ const MovieDetail = () => {
       {
         modeedit && (
           <div style={{ marginLeft: '4%', marginTop: '12px', }}>
-            <button type="button" onClick={() => createEP()}>Create Ep</button>
+            <button type="button" 
+            style={{
+              width: '100px',
+              height: '30px',
+              display: 'flex', // Bắt buộc để dùng justifyContent + alignItems
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: '7px',
+              border: 'none', // thay vì borderWidth
+              boxShadow: '0px 1px 2px 3px blue' // bỏ "inherit"
+            }} onClick={() => createEP()}>Create Ep</button>
           </div>
         )
       }
@@ -180,9 +199,29 @@ const MovieDetail = () => {
                 {episode.title}
               </Link>
               {modeedit && (
-                <div>
-                  <button onClick={ () => editEP(episode.id)}>Edit</button>
-                  <button onClick={ () => DeleteEP(episode.id)}>Delete</button>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px'}}>
+                  <button  
+                  style={{
+                    width: '100px',
+                    height: '30px',
+                    display: 'flex', // Bắt buộc để dùng justifyContent + alignItems
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderRadius: '7px',
+                    border: 'none', // thay vì borderWidth
+                    boxShadow: '0px 1px 2px 3px blue' // bỏ "inherit"
+                  }} onClick={ () => editEP(episode.id)}>Edit</button>
+                  <button 
+                  style={{
+                    width: '100px',
+                    height: '30px',
+                    display: 'flex', // Bắt buộc để dùng justifyContent + alignItems
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderRadius: '7px',
+                    border: 'none', // thay vì borderWidth
+                    boxShadow: '0px 1px 2px 3px blue' // bỏ "inherit"
+                  }} onClick={ () => DeleteEP(episode.id)}>Delete</button>
                 </div>
               )}
             </li>

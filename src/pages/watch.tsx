@@ -103,7 +103,7 @@ const Watch = () => {
                   </span>
                 ) : (
                   <Link
-                    to={`/movie/${id}/${ep.id}`}
+                    to={`/movie/${id}/${ep.episodeNumber}`}
                     className="episode-link"
                   >
                     ▶️ {ep.title}

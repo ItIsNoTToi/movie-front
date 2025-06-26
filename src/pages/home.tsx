@@ -4,7 +4,6 @@ import { fetchMovies } from "../services/movieService";
 import { Link } from "react-router-dom";
 import './home.css'
 
-
 const Home = () => {
   const [user, setUser] = useState(null);
   const [movies, setMovies] = useState<Movie[]>([]);

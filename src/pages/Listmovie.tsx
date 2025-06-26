@@ -1,281 +1,341 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { faSearch, faChevronLeft, faChevronRight, faStar } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { fetchMovies } from '../services/movieService';
+import { Movie } from '../types/movie';
 
-const sampleData = [
-  {
-    id: 1,
-    name: 'React Basics',
-    category: 'Programming',
-    hashtags: ['#react', '#javascript', '#frontend'],
-    releaseDate: '2022-01-15',
-    author: 'John Doe',
-  },
-  {
-    id: 2,
-    name: 'Advanced React Patterns',
-    category: 'Programming',
-    hashtags: ['#react', '#patterns'],
-    releaseDate: '2023-03-10',
-    author: 'Jane Smith',
-  },
-  {
-    id: 3,
-    name: 'Cooking Tips',
-    category: 'Lifestyle',
-    hashtags: ['#cooking', '#food', '#tips'],
-    releaseDate: '2021-11-25',
-    author: 'Chef Alex',
-  },
-  {
-    id: 4,
-    name: 'Photography 101',
-    category: 'Art',
-    hashtags: ['#photography', '#art'],
-    releaseDate: '2022-05-05',
-    author: 'Emily Clark',
-  },
-  {
-    id: 5,
-    name: 'React Hooks Deep Dive',
-    category: 'Programming',
-    hashtags: ['#react', '#hooks', '#javascript'],
-    releaseDate: '2024-05-20',
-    author: 'Mark Antonio',
-  },
-];
+const styles: { [key: string]: React.CSSProperties } = {
+  container: {
+    backgroundColor: 'rgba(185, 241, 19, 0.5)',
+    color: 'white',
+    minHeight: '100vh',
+    padding: '1rem',
+  } as React.CSSProperties,
+  header: {
+    marginBottom: '2rem',
+  } as React.CSSProperties,
+  title: {
+    fontSize: '2.25rem',
+    fontWeight: 'bold',
+    marginBottom: '0.5rem',
+  } as React.CSSProperties,
+  subtitle: {
+    color: 'black',
+  } as React.CSSProperties,
+  searchInputWrapper: {
+    display: 'flex',
+    gap: '1rem',
+    marginBottom: '1.5rem',
+    flexWrap: 'wrap',
+  } as React.CSSProperties,
+  searchInput: {
+    flexGrow: 1,
+    backgroundColor: '#2d3748',
+    borderRadius: '9999px',
+    padding: '0.75rem 1.5rem',
+    color: 'white',
+    border: 'none',
+    outline: 'none',
+  } as React.CSSProperties,
+  button: {
+    backgroundColor: '#3182ce',
+    color: 'white',
+    padding: '0.75rem 1.5rem',
+    borderRadius: '9999px',
+    border: 'none',
+    cursor: 'pointer',
+  } as React.CSSProperties,
+  filterButtons: {
+    display: 'flex',
+    gap: '0.5rem',
+    overflowX: 'auto',
+    paddingBottom: '0.5rem',
+    marginBottom: '1.5rem',
+  } as React.CSSProperties,
+  sectionTop: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '1rem',
+  } as React.CSSProperties,
+  sortSelect: {
+    backgroundColor: '#2d3748',
+    color: 'white',
+    borderRadius: '0.25rem',
+    padding: '0.5rem 1rem',
+    border: 'none',
+  } as React.CSSProperties,
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+    gap: '1rem',
+  } as React.CSSProperties,
+  card: {
+    backgroundColor: '#2d3748',
+    borderRadius: '0.5rem',
+    overflow: 'hidden',
+    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+  } as React.CSSProperties,
+  poster: {
+    width: '100%',
+    height: '250px',
+    objectFit: 'cover',
+  } as React.CSSProperties,
+  ratingBadge: {
+    position: 'absolute',
+    top: '0.5rem',
+    right: '0.5rem',
+    backgroundColor: '#3182ce',
+    color: 'white',
+    padding: '0.25rem 0.5rem',
+    fontSize: '0.75rem',
+    fontWeight: 'bold',
+    borderRadius: '0.25rem',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.25rem',
+  } as React.CSSProperties,
+  movieContent: {
+    padding: '1rem',
+  } as React.CSSProperties,
+  movieTitle: {
+    fontWeight: '600',
+    fontSize: '1.125rem',
+    marginBottom: '0.25rem',
+  } as React.CSSProperties,
+  movieDetails: {
+    fontSize: '0.875rem',
+    color: '#a0aec0',
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginBottom: '0.5rem',
+  } as React.CSSProperties,
+  pagination: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: '2rem',
+    gap: '0.5rem',
+  } as React.CSSProperties,
+  
+};
 
-const categories = ['All', 'Programming', 'Lifestyle', 'Art'];
+const styleFunctions = {
+  filterBtn: (active: boolean): React.CSSProperties => ({
+    padding: '0.5rem 1rem',
+    borderRadius: '9999px',
+    backgroundColor: active ? '#3182ce' : '#2d3748',
+    color: active ? 'white' : '#a0aec0',
+    border: 'none',
+    cursor: 'pointer',
+  }),
+  watchlistBtn: (inList: boolean): React.CSSProperties => ({
+    width: '100%',
+    padding: '0.5rem',
+    borderRadius: '0.25rem',
+    fontSize: '0.875rem',
+    cursor: 'pointer',
+    color: 'white',
+    backgroundColor: inList ? '#38a169' : '#4a5568',
+    border: 'none',
+  }),
+  paginationBtn: (active: boolean): React.CSSProperties => ({
+    padding: '0.5rem 1rem',
+    borderRadius: '0.25rem',
+    backgroundColor: active ? '#3182ce' : '#2d3748',
+    color: active ? 'white' : '#a0aec0',
+    border: 'none',
+    cursor: 'pointer',
+  }),
+};
 
-const SearchAll: React.FC  = () => {
-  const [filters, setFilters] = useState({
-    category: 'All',
-    hashtag: '',
-    name: '',
-    releaseDate: '',
-    author: '',
+
+const LISTMOVIE = () => {
+  const [movies, setMovie] = useState<Movie[]>([]);
+
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('latest');
+  const [currentPage, setCurrentPage] = useState(1);
+  const moviesPerPage = 10;
+  const [watchlist, setWatchlist] = useState<number[]>([]);
+
+  const filterOptions = [
+    { id: 'all', label: 'All Movies' },
+    { id: 'trending', label: 'Trending' },
+    { id: 'recommended', label: 'Recommended' },
+    { id: 'action', label: 'Action' },
+    { id: 'comedy', label: 'Comedy' },
+    { id: 'drama', label: 'Drama' },
+    { id: 'horror', label: 'Horror' },
+    { id: 'scifi', label: 'Sci-Fi' },
+  ];
+
+  const sortOptions = [
+    { value: 'latest', label: 'Latest' },
+    { value: 'top-rated', label: 'Top Rated' },
+    { value: 'a-z', label: 'A-Z' },
+    { value: 'year', label: 'Release Year' },
+  ];
+
+  const filteredMovies = movies.filter(movie => {
+    const matchesSearch = movie.title.toLowerCase().includes(searchQuery.toLowerCase());
+    let matchesFilter = true;
+    if (activeFilter === 'trending') matchesFilter = !!(movie as any).isTrending;
+    if (activeFilter === 'recommended') matchesFilter = !!(movie as any).isRecommended;
+    if (['action', 'comedy', 'drama', 'horror', 'scifi'].includes(activeFilter)) {
+      matchesFilter = movie.genres.some(g => g.name.toLowerCase() === activeFilter);
+    }
+    return matchesSearch && matchesFilter;
+  }).sort((a, b) => {
+    switch (sortBy) {
+      case 'latest': return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime();
+      case 'top-rated': return b.rating - a.rating;
+      case 'a-z': return a.title.localeCompare(b.title);
+      case 'year': return new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime();
+      default: return Number(b.id) - Number(a.id); // id là string nên cần ép sang số
+    }
   });
 
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const indexOfLastMovie = currentPage * moviesPerPage;
+  const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
+  const currentMovies = filteredMovies.slice(indexOfFirstMovie, indexOfLastMovie);
+  const totalPages = Math.ceil(filteredMovies.length / moviesPerPage);
+
+  const toggleWatchlist = (movieId: number) => {
+    setWatchlist(prev =>
+      prev.includes(movieId) ? prev.filter(id => id !== movieId) : [...prev, movieId]
+    );
   };
 
-  const filterItems = () => {
-    return sampleData.filter((item) => {
-      // Category filter
-      if (filters.category !== 'All' && item.category !== filters.category) {
-        return false;
-      }
-      // Hashtag filter (case-insensitive, match any hashtag includes the search)
-      if (
-        filters.hashtag &&
-        !item.hashtags.some((tag) =>
-          tag.toLowerCase().includes(filters.hashtag.toLowerCase())
-        )
-      ) {
-        return false;
-      }
-      // Name filter (case-insensitive substring)
-      if (
-        filters.name &&
-        !item.name.toLowerCase().includes(filters.name.toLowerCase())
-      ) {
-        return false;
-      }
-      // Release date filter (YYYY-MM-DD)
-      if (filters.releaseDate && item.releaseDate !== filters.releaseDate) {
-        return false;
-      }
-      // Author filter (case-insensitive substring)
-      if (
-        filters.author &&
-        !item.author.toLowerCase().includes(filters.author.toLowerCase())
-      ) {
-        return false;
-      }
-      return true;
-    });
-  };
-
-  const filteredItems = filterItems();
+  useEffect(() => {
+      fetchMovies()
+        .then(data => {
+          setMovie(data.movies);
+        })
+        .catch(console.error);
+    }, []);
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>Search All</h1>
-      <div style={styles.filterBox}>
-        <div style={styles.filterGroup}>
-          <label htmlFor="category" style={styles.label}>
-            Category
-          </label>
-          <select
-            id="category"
-            name="category"
-            value={filters.category}
-            onChange={handleChange}
-            style={styles.select}
-          >
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div style={styles.filterGroup}>
-          <label htmlFor="hashtag" style={styles.label}>
-            Hashtag
-          </label>
-          <input
-            id="hashtag"
-            name="hashtag"
-            type="text"
-            placeholder="e.g. #react"
-            value={filters.hashtag}
-            onChange={handleChange}
-            style={styles.input}
-          />
-        </div>
-        <div style={styles.filterGroup}>
-          <label htmlFor="name" style={styles.label}>
-            Name
-          </label>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            placeholder="Item name"
-            value={filters.name}
-            onChange={handleChange}
-            style={styles.input}
-          />
-        </div>
-        <div style={styles.filterGroup}>
-          <label htmlFor="releaseDate" style={styles.label}>
-            Release Date
-          </label>
-          <input
-            id="releaseDate"
-            name="releaseDate"
-            type="date"
-            value={filters.releaseDate}
-            onChange={handleChange}
-            style={styles.input}
-          />
-        </div>
-        <div style={styles.filterGroup}>
-          <label htmlFor="author" style={styles.label}>
-            Author
-          </label>
-          <input
-            id="author"
-            name="author"
-            type="text"
-            placeholder="Author name"
-            value={filters.author}
-            onChange={handleChange}
-            style={styles.input}
-          />
-        </div>
+      <div style={styles.header}>
+        <h1 style={styles.title}>KAMEN RIDER HUB</h1>
+        <p style={styles.subtitle}>Discover your next favorite superhero movie</p>
       </div>
 
-      <div style={styles.results}>
-        {filteredItems.length > 0 ? (
-          filteredItems.map((item) => (
-            <div key={item.id} style={styles.card}>
-              <h3 style={styles.itemName}>{item.name}</h3>
-              <p><strong>Category:</strong> {item.category}</p>
-              <p><strong>Hashtags:</strong> {item.hashtags.join(' ')}</p>
-              <p><strong>Release Date:</strong> {item.releaseDate}</p>
-              <p><strong>Author:</strong> {item.author}</p>
-            </div>
-          ))
-        ) : (
-          <p style={styles.noResults}>No results found.</p>
-        )}
+      <div style={styles.searchInputWrapper}>
+        <input
+          type="text"
+          placeholder="Search for movies..."
+          style={styles.searchInput}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button style={styles.button}>
+          <FontAwesomeIcon icon={faSearch} />
+        </button>
       </div>
+
+      <div style={styles.filterButtons}>
+        {filterOptions.map(option => (
+          <button
+            key={option.id}
+            style={styleFunctions.filterBtn(activeFilter === option.id)}
+            onClick={() => setActiveFilter(option.id)}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+
+      <div style={styles.sectionTop}>
+        <h2>
+          {activeFilter === 'all' ? 'All Movies' :
+            activeFilter === 'trending' ? 'Trending Movies' :
+              activeFilter === 'recommended' ? 'Recommended' :
+                `${activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1)} Movies`}
+        </h2>
+        <select
+          style={styles.sortSelect}
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+        >
+          {sortOptions.map(option => (
+            <option key={option.value} value={option.value}>{option.label}</option>
+          ))}
+        </select>
+      </div>
+
+      {currentMovies.length > 0 ? (
+        <div style={styles.grid}>
+          {currentMovies.map(movie => (
+            <div key={movie.id} style={styles.card}>
+              <div style={{ position: 'relative' }}>
+                <img
+                  src={movie.posterUrl}
+                  alt={movie.title}
+                  style={styles.poster}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x450?text=No+Poster';
+                  }}
+                />
+                <div style={styles.ratingBadge}>
+                  <FontAwesomeIcon icon={faStar} size="xs" />
+                  <span>{movie.rating.toFixed(1)}</span>
+                </div>
+              </div>
+              <div style={styles.movieContent}>
+                <h3 style={styles.movieTitle}>{movie.title}</h3>
+                <div style={styles.movieDetails}>
+                  <span>{new Date(movie.releaseDate).getFullYear()}</span>
+                  <span>{movie.genres.map(g => g.name).join(', ')}</span>
+                </div>
+                <button
+                  style={styleFunctions.watchlistBtn(watchlist.includes(Number(movie.id)))}
+                  onClick={() => toggleWatchlist(Number(movie.id))}
+                >
+                  {watchlist.includes(Number(movie.id)) ? '✓ In Watchlist' : '+ Watchlist'}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p style={{ textAlign: 'center', padding: '3rem', color: '#a0aec0' }}>
+          No movies found matching your criteria.
+        </p>
+      )}
+
+      {filteredMovies.length > moviesPerPage && (
+        <div style={styles.pagination}>
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            style={styleFunctions.paginationBtn(false)}
+          >
+            <FontAwesomeIcon icon={faChevronLeft} />
+          </button>
+
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i + 1}
+              style={styleFunctions.paginationBtn(currentPage === i + 1)}
+              onClick={() => setCurrentPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            style={styleFunctions.paginationBtn(false)}
+          >
+            <FontAwesomeIcon icon={faChevronRight} />
+          </button>
+        </div>
+      )}
     </div>
   );
 };
 
-const styles: { [key: string]: React.CSSProperties } = {
-  container: {
-    maxWidth: '900px',
-    margin: '40px auto',
-    padding: '0 20px',
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-  },
-  title: {
-    textAlign: 'center',
-    fontSize: '2.8rem',
-    color: '#222',
-    marginBottom: '30px',
-  },
-  filterBox: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '20px',
-    marginBottom: '40px',
-    backgroundColor: '#f9f9f9',
-    padding: '20px',
-    borderRadius: '12px',
-    boxShadow:
-      '0 4px 6px rgba(0, 0, 0, 0.1)',
-  },
-  filterGroup: {
-    flex: '1 1 160px',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  label: {
-    marginBottom: '8px',
-    fontWeight: '600',
-    color: '#555',
-    fontSize: '1rem',
-  },
-  input: {
-    padding: '10px 14px',
-    borderRadius: '8px',
-    border: '1.5px solid #ccc',
-    fontSize: '1rem',
-    outlineColor: '#007bff',
-    transition: 'border-color 0.3s',
-  },
-  select: {
-    padding: '10px 14px',
-    borderRadius: '8px',
-    border: '1.5px solid #ccc',
-    fontSize: '1rem',
-    outlineColor: '#007bff',
-    appearance: 'none',
-    backgroundColor: '#fff',
-  },
-  results: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))',
-    gap: '25px',
-  },
-  card: {
-    backgroundColor: 'white',
-    padding: '20px',
-    borderRadius: '14px',
-    boxShadow:
-      '0 6px 15px rgba(0,0,0,0.1)',
-    transition: 'transform 0.2s ease',
-    cursor: 'default',
-  },
-  itemName: {
-    marginTop: 0,
-    marginBottom: '10px',
-    color: '#007bff',
-  },
-  noResults: {
-    fontSize: '1.2rem',
-    color: '#777',
-    textAlign: 'center',
-  },
-};
-
-export default SearchAll;
-
+export default LISTMOVIE;

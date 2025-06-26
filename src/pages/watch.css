@@ -2,7 +2,7 @@
 
 /* Tổng thể */
 body {
-  background-color: #eeeaea;
+  background: linear-gradient(to right, rgba(185, 241, 19, 0.5), rgb(19, 156, 241));
   color: #bc0d0d;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
