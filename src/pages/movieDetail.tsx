@@ -40,6 +40,10 @@ const MovieDetail = () => {
   const [editForm, seteditForm] = useState<boolean>(false);
   const [a, seta] = useState<any>();
   const role = JSON.parse(localStorage.getItem("role") || "{}");
+  
+  const [rating, setRating] = useState<number>(0); // Lưu trữ điểm đánh giá
+  const [comment, setComment] = useState<string>(''); // Lưu trữ nội dung bình luận
+  const [commentsList, setCommentsList] = useState<string[]>([]); // Danh sách bình luận
 
   useEffect(() => {
     if (id) {
@@ -139,6 +143,29 @@ const MovieDetail = () => {
     }
   };
 
+  // Hàm để xử lý khi người dùng gửi đánh giá và bình luận
+  const handleCommentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); // Ngăn chặn hành vi mặc định của form
+
+    // Kiểm tra xem người dùng đã nhập bình luận hay chưa
+    if (!comment) {
+      alert("Vui lòng nhập bình luận của bạn!");
+      return;
+    }
+
+    // Thêm bình luận vào danh sách bình luận
+    setCommentsList(prev => [...prev, comment]);
+    setComment(''); // Reset nội dung bình luận
+
+    // Gửi đánh giá và bình luận đến server (nếu cần)
+    try {
+      await axios.post(`/movie/${movie.id}/comments`, { rating, comment });
+      alert("Bình luận của bạn đã được gửi!");
+    } catch (error) {
+      console.error("Có lỗi xảy ra khi gửi bình luận:", error);
+      alert("Gửi bình luận thất bại!");
+    }
+  };
 
   return (
     <div className="movie-detail-container" >
@@ -154,7 +181,8 @@ const MovieDetail = () => {
             alignItems: 'center',
             borderRadius: '7px',
             border: 'none', // thay vì borderWidth
-            boxShadow: '0px 1px 2px 3px blue' // bỏ "inherit"
+            background: 'linear-gradient(to right bottom, rgb(19, 156, 241), rgba(185, 241, 19, 0.5))',
+            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.3)', // chỉ đổ bóng đen đơn giản
           }} onClick={ModeEdit}>Admin Mode</button>:
           <div></div>
         }
@@ -185,7 +213,8 @@ const MovieDetail = () => {
               alignItems: 'center',
               borderRadius: '7px',
               border: 'none', // thay vì borderWidth
-              boxShadow: '0px 1px 2px 3px blue' // bỏ "inherit"
+              background: 'linear-gradient(to right bottom, rgb(19, 156, 241), rgba(185, 241, 19, 0.5))',
+              boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.3)', // chỉ đổ bóng đen đơn giản
             }} onClick={() => createEP()}>Create Ep</button>
           </div>
         )
@@ -209,7 +238,8 @@ const MovieDetail = () => {
                     alignItems: 'center',
                     borderRadius: '7px',
                     border: 'none', // thay vì borderWidth
-                    boxShadow: '0px 1px 2px 3px blue' // bỏ "inherit"
+                    background: 'linear-gradient(to right bottom, rgb(19, 156, 241), rgba(185, 241, 19, 0.5))',
+                    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.3)',
                   }} onClick={ () => editEP(episode.id)}>Edit</button>
                   <button 
                   style={{
@@ -219,8 +249,8 @@ const MovieDetail = () => {
                     justifyContent: 'center',
                     alignItems: 'center',
                     borderRadius: '7px',
-                    border: 'none', // thay vì borderWidth
-                    boxShadow: '0px 1px 2px 3px blue' // bỏ "inherit"
+                    background: 'linear-gradient(to right bottom, rgb(19, 156, 241), rgba(185, 241, 19, 0.5))',
+                    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.3)',
                   }} onClick={ () => DeleteEP(episode.id)}>Delete</button>
                 </div>
               )}
@@ -228,6 +258,45 @@ const MovieDetail = () => {
           ))}
         </ul>
       </div>
+
+      <div style={{ padding: '20px', justifyContent: 'flex-start', borderRadius: '12px', }}>
+        {/* rate and comment */}
+        <div className="movie-rating-and-comment">
+          <h2>Đánh giá và bình luận</h2>
+          <form onSubmit={handleCommentSubmit}>
+            <div style={{ display: 'flex', gap: '10px'}}>
+              <label>Điểm đánh giá:</label>
+              <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
+                <option value={0}>Chọn điểm đánh giá</option>
+                <option value={1}>1</option>
+                <option value={2}>2</option>
+                <option value={3}>3</option>
+                <option value={4}>4</option>
+                <option value={5}>5</option>
+              </select>
+            </div>
+            <div style={{ display: 'flex', gap: '10px'}}>
+              <label>Bình luận:</label>
+              <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Nhập bình luận của bạn..."
+              />
+            </div>
+            <button type="submit">Gửi bình luận</button>
+          </form>
+
+          <div className="comments-list">
+            <h3>Bình luận:</h3>
+            <ul>
+              {commentsList.map((c, index) => (
+                <li key={index}>{c}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+
       {editForm && (
         <div style={styles.modalOverlay}>
           <div style={styles.bg}>
@@ -327,3 +396,4 @@ const styles: { [key: string]: React.CSSProperties } = {
 }
 
 export default MovieDetail;
+// end{code}
