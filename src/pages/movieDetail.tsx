@@ -5,6 +5,14 @@ import './MovieDetail.css';
 import { v4 as uuidv4 } from 'uuid';
 import { AddEpisode, convertToMySQLDate, deleteEpisode, EditEpisode } from "../services/episodeService";
 import { Genre, Hashtag } from "../types/movie";
+import { GetCommentAndrating, PostCommentAndrating } from "../services/commentservices";
+import { Rating } from 'react-simple-star-rating';
+
+type CommentType = {
+  account: { username: string };
+  comment: string;
+  rating: number;
+};
 
 type EpisodeType = {
   id: number;
@@ -27,6 +35,7 @@ type MovieDetailType = {
 };
 
 const MovieDetail = () => {
+  const [user, setUser] = useState<any>(null);
   const { id } = useParams<{ id: string }>();
   const [epID, setepId] = useState<number>(0);
   const [title, setTitle] = useState<string>('');
@@ -43,7 +52,22 @@ const MovieDetail = () => {
   
   const [rating, setRating] = useState<number>(0); // Lưu trữ điểm đánh giá
   const [comment, setComment] = useState<string>(''); // Lưu trữ nội dung bình luận
-  const [commentsList, setCommentsList] = useState<string[]>([]); // Danh sách bình luận
+  const [commentsList, setCommentsList] = useState<CommentType[]>([]);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  useEffect(() => {
+    GetCommentAndrating(id)
+    .then(data => {
+      // console.log('data từ API:', data); // <-- kiểm tra kỹ ở đây
+      setCommentsList(data.rating);
+    });
+  }, [])
 
   useEffect(() => {
     if (id) {
@@ -154,12 +178,20 @@ const MovieDetail = () => {
     }
 
     // Thêm bình luận vào danh sách bình luận
-    setCommentsList(prev => [...prev, comment]);
+    setCommentsList(prev => [
+        ...prev,
+        {
+          account: { username: user.username },
+          comment: comment,
+          rating: rating
+        }
+      ]);
     setComment(''); // Reset nội dung bình luận
 
     // Gửi đánh giá và bình luận đến server (nếu cần)
     try {
-      await axios.post(`/movie/${movie.id}/comments`, { rating, comment });
+      await PostCommentAndrating(id, comment, rating, user)
+      // .then(data => console.log(data));
       alert("Bình luận của bạn đã được gửi!");
     } catch (error) {
       console.error("Có lỗi xảy ra khi gửi bình luận:", error);
@@ -263,34 +295,45 @@ const MovieDetail = () => {
         {/* rate and comment */}
         <div className="movie-rating-and-comment">
           <h2>Đánh giá và bình luận</h2>
-          <form onSubmit={handleCommentSubmit}>
-            <div style={{ display: 'flex', gap: '10px'}}>
-              <label>Điểm đánh giá:</label>
-              <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
-                <option value={0}>Chọn điểm đánh giá</option>
-                <option value={1}>1</option>
-                <option value={2}>2</option>
-                <option value={3}>3</option>
-                <option value={4}>4</option>
-                <option value={5}>5</option>
-              </select>
-            </div>
-            <div style={{ display: 'flex', gap: '10px'}}>
-              <label>Bình luận:</label>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Nhập bình luận của bạn..."
-              />
-            </div>
-            <button type="submit">Gửi bình luận</button>
-          </form>
+          {user ? (
+            <form onSubmit={handleCommentSubmit}>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <label>Điểm đánh giá:</label>
+                <Rating
+                  onClick={(rate) => setRating(rate)}
+                  initialValue={rating}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <label>Bình luận:</label>
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Nhập bình luận của bạn..."
+                />
+              </div>
+              <button type="submit">Gửi bình luận</button>
+            </form>
+          ) : (
+            <p style={{ color: "red" }}>Vui lòng <Link to="/login">đăng nhập</Link> để bình luận.</p>
+          )}
 
           <div className="comments-list">
             <h3>Bình luận:</h3>
             <ul>
-              {commentsList.map((c, index) => (
-                <li key={index}>{c}</li>
+              {commentsList?.map((c: any, index) => (
+                <li key={index}>
+                  <div>{c.account.username}: {c.comment} - 
+                    <div style={{ display: 'inline-block', marginLeft: '10px' }}>
+                      <Rating
+                        initialValue={c.rating}
+                        readonly
+                        size={20}
+                        allowFraction
+                      />
+                    </div>
+                  </div>
+                </li>
               ))}
             </ul>
           </div>
@@ -363,7 +406,6 @@ const MovieDetail = () => {
     </div>
   );
 };
-
 
 const styles: { [key: string]: React.CSSProperties } = {
   modalOverlay: {

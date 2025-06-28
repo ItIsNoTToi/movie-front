@@ -58,6 +58,7 @@ const LoginPage: React.FC = () => {
                 setSubmitMessage('Login successful!');
                 localStorage.setItem("token", JSON.stringify(response.data.token));
                 localStorage.setItem("role", JSON.stringify(response.data.role));
+                localStorage.setItem("user", JSON.stringify(response.data.user));
                 // navigate('/'); 
                 window.location.href = '/';
             } else {
