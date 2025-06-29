@@ -125,34 +125,43 @@ const ProfilePage: React.FC = () => {
         </div>
 
         <div style={styles.buttonContainer}>
-          {isEditing ? (
-            <>
-              <button onClick={handleSave} style={styles.saveButton}>
-                Save
+          <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+              {isEditing ? (
+              <>
+                <button onClick={handleSave} style={styles.saveButton}>
+                  Save
+                </button>
+                <button onClick={handleEditToggle} style={styles.cancelButton}>
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <button onClick={handleEditToggle} style={styles.editButton}>
+                Edit Profile
               </button>
-              <button onClick={handleEditToggle} style={styles.cancelButton}>
-                Cancel
-              </button>
-            </>
-          ) : (
-            <button onClick={handleEditToggle} style={styles.editButton}>
-              Edit Profile
+            )}
+
+            {
+              role == 'Admin' ?
+              (
+                <button onClick={()=> navigate('/9710010910511011297103101')} style={styles.editButton}>
+                  Admin Page
+                </button>
+              )
+              : ('')
+            }
+          </div>
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginTop: '10px', }}>
+            <button onClick={() => navigate('/WATCH-HISTORY')} style={styles.editButton}>
+              Watch Hisory
             </button>
-          )}
 
-          {
-            role == 'Admin' ?
-            (
-              <button onClick={()=> navigate('/9710010910511011297103101')} style={styles.editButton}>
-                Admin Page
-              </button>
-            )
-            : ('')
-          }
-
-          <button onClick={Logout} style={styles.editButton}>
-            Log out
-          </button>
+            <button onClick={Logout} style={styles.editButton}>
+              Log out
+            </button>
+          </div>
+          
         </div>
 
         {saveMessage && <div style={styles.success}>{saveMessage}</div>}
@@ -224,9 +233,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginTop: 2,
   },
   buttonContainer: {
-    display: 'flex',
+    display: 'block',
     justifyContent: 'center',
-    gap: '1rem',
+    gap: '20px',
+    alignItems: 'center',
   },
   editButton: {
     backgroundColor: '#6E8EFb',

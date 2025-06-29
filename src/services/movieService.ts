@@ -1,5 +1,5 @@
+import { Movie } from './../types/movie';
 import axios from "../axiosConfig";
-import { Movie } from "../types/movie";
 
 export type MovieResponse = {
   movies: Movie[];
@@ -56,4 +56,22 @@ export const searchItems = async (filters: any) => {
   // console.log(filters);
   const res = await axios.post('/findmovies', filters); 
   return res.data; // Cập nhật URL nếu cần
+};
+
+export const saveWatchHistory = async (user: any, movieId: any) => {
+  const res = await axios.post('/api/watch-history', {
+    user: user,
+    movieId: movieId
+  }); 
+  return res.data; 
+}
+
+export const fetchWatchHistory = async (userId: any) => {
+  try {
+    // console.log(userId);
+    const response = await axios.get(`/api/watch-history/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching watch history:", error);
+  }
 };

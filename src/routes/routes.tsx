@@ -13,6 +13,7 @@ import AdminMovieManagementPage from "../pages/Admin/movie_dashboard";
 import SearchAll from "../pages/searchAll";
 import AdminCategoriesManagementPage from "../pages/Admin/categories_dashboard";
 import LISTMOVIE from "../pages/Listmovie";
+import WatchHistory from "../pages/watchhistory";
 
 const AppRoutes = () => (
   <Routes>
@@ -23,6 +24,7 @@ const AppRoutes = () => (
     <Route path="/searchAll" element={<SearchAll />} />
     <Route path="/List-movie" element={<LISTMOVIE/>} />
     <Route path="/top-movie" element={<></>} />
+    <Route path="/WATCH-HISTORY" element={<WatchHistory/>} />
     {/* Render các route quản trị */}
     {AdminRoutes()}
     {/* Route đăng nhập/đăng ký */}

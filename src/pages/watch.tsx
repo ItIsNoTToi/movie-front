@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "../axiosConfig";
 import './watch.css';
+import { saveWatchHistory } from "../services/movieService";
 
 type Episode = {
   id: number;
@@ -25,6 +26,7 @@ type Episode = {
 // };
 
 const Watch = () => {
+  const [user, setUser] = useState<any>(null);
   const { id, episode } = useParams<{ id: string; episode: string }>();
   const [episodeData, setEpisodeData] = useState<Episode | null>(null);
   const [listEpisode, setlistEpisode] = useState<Episode[]>([]);
@@ -39,6 +41,18 @@ const Watch = () => {
   //       .catch((err) => console.error(err));
   //   }
   // }, [id]);
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  useEffect(() => {
+    saveWatchHistory(user, id)
+    // .then(data => console.log(data.message));
+  }, []);
+
   useEffect(() => {
     if (id) {
       axios

@@ -60,7 +60,7 @@ const MovieDetail = () => {
       setUser(JSON.parse(storedUser));
     }
   }, []);
-
+  
   useEffect(() => {
     GetCommentAndrating(id)
     .then(data => {
