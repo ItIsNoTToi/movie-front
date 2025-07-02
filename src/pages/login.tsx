@@ -55,14 +55,18 @@ const LoginPage: React.FC = () => {
             });
 
             if (response.status === 200) {
-                setSubmitMessage('Login successful!');
-                localStorage.setItem("token", JSON.stringify(response.data.token));
-                localStorage.setItem("role", JSON.stringify(response.data.role));
-                localStorage.setItem("user", JSON.stringify(response.data.user));
-                // navigate('/'); 
-                window.location.href = '/';
-            } else {
-                setSubmitMessage('Login failed. Please try again.');
+              setSubmitMessage('Login successful!');
+              localStorage.setItem("token", JSON.stringify(response.data.token));
+              localStorage.setItem("role", JSON.stringify(response.data.role));
+              localStorage.setItem("user", JSON.stringify(response.data.user));
+              // navigate('/'); 
+              window.location.href = '/';
+            } else if (response.status === 403) {
+              alert('Your account is not activated. Please check your email for the activation link.');
+              setSubmitMessage('Your account is not activated. Please check your email for the activation link.');
+            } else{
+              alert('Login failed. Please try again.');
+              setSubmitMessage('Login failed. Please try again.');
             }
         } catch (error: any) {
             setSubmitMessage(error.response?.data?.message || 'Login failed. Please check your credentials.');

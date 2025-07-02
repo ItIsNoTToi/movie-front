@@ -141,6 +141,17 @@ const ProfilePage: React.FC = () => {
               </button>
             )}
 
+            <button onClick={() => navigate('/WATCH-HISTORY')} style={styles.editButton}>
+              Watch Hisory
+            </button>
+          </div>
+          
+          <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginTop: '10px', }}>
+            <button onClick={Logout} style={styles.editButton}>
+              Log out
+            </button>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginTop: '10px', }}>
             {
               role == 'Admin' ?
               (
@@ -151,19 +162,7 @@ const ProfilePage: React.FC = () => {
               : ('')
             }
           </div>
-          
-          <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginTop: '10px', }}>
-            <button onClick={() => navigate('/WATCH-HISTORY')} style={styles.editButton}>
-              Watch Hisory
-            </button>
-
-            <button onClick={Logout} style={styles.editButton}>
-              Log out
-            </button>
-          </div>
-          
         </div>
-
         {saveMessage && <div style={styles.success}>{saveMessage}</div>}
       </div>
     </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
+import { Register } from '../services/authorizeservices';
 
 interface FormData {
   fullName: string;
@@ -67,7 +68,12 @@ const RegisterPage: React.FC = () => {
     if (validate()) {
       setSubmitted(true);
       // Here you could send data to backend or API
-      console.log('Form submitted:', formData);
+      // console.log('Form submitted:', formData);
+      Register(formData.fullName, formData.email, formData.password)
+      .then(data => {
+        console.log('Registration successful:', data.message);
+        navigate('/login'); // Redirect to login after successful registration
+      });
     }
   };
 

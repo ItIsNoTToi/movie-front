@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getaccount } from '../../services/adminservices';
+import { Ban_User } from '../../services/authorizeservices';
 
 interface CardProps {
   title: string;
@@ -36,17 +37,46 @@ interface User {
 const AdminPage: React.FC = () => {
   const navigation = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
+  const [ac, setAc] = useState<User>();
 
   useEffect(() =>{
     getaccount()
     .then(data => setUsers(data.account))
-  },[])
+  },[]);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setAc(JSON.parse(storedUser));
+    }
+  }, []);
 
   const role = JSON.parse(localStorage.getItem("role") || "{}");
   if(role !== 'Admin'){
     return <div>Cut </div>
   }
-  else
+  else{
+
+  }
+
+  const BanUser = async (id: number) => {
+    const confirmed = window.confirm("Are you sure you want to ban this user?");
+    if (!confirmed) return;
+
+    try {
+      const response = await Ban_User(id);
+      window.alert("User has been banned successfully.");
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+      window.alert("Failed to ban the user.");
+    }
+  };
+
+  const DeleteAccount = (id: number) => {
+    // Implement the delete account logic here
+  };
+
   return (
     <div style={styles.container}>
       <aside style={styles.sidebar}>
@@ -99,6 +129,7 @@ const AdminPage: React.FC = () => {
                 <th style={styles.th}>Email</th>
                 <th style={styles.th}>Role</th>
                 <th style={styles.th}>Status</th>
+                <th style={styles.th}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -118,6 +149,46 @@ const AdminPage: React.FC = () => {
                     >
                       {user.isActived}
                     </span>
+                  </td>
+                  <td style={styles.td}>
+                    {user.id !== ac?.id ? (
+                      user.isActived === true ? (
+                        <button
+                          style={{
+                            backgroundColor: '#2f89fc',
+                            color: '#fff',
+                            padding: '5px 10px',
+                            borderRadius: 4,
+                            border: 'none',
+                            cursor: 'pointer',
+                          }}
+                          onClick={() => BanUser(user.id)}
+                        >
+                          Ban
+                        </button>
+                      ) : (
+                        <button
+                          style={{
+                            backgroundColor: '#2f89fc',
+                            color: '#fff',
+                            padding: '5px 10px',
+                            borderRadius: 4,
+                            border: 'none',
+                            cursor: 'pointer',
+                          }}
+                          onClick={() => BanUser(user.id)}
+                        >
+                          Unban
+                        </button>
+                      )
+                    ) : null}
+                    
+                    <button
+                      style={{ backgroundColor: '#f44336', color: '#fff', padding: '5px 10px', borderRadius: 4, border: 'none', marginLeft: 10, cursor: 'pointer' }}
+                      onClick={() => DeleteAccount(user.id)}
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
