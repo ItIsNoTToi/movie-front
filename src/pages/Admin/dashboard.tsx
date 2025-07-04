@@ -104,6 +104,16 @@ const AdminPage: React.FC = () => {
                 Movies
               </a>
             </li>
+             <li style={styles.navItem}>
+              <a 
+                href="/9710010910511011297103101/commentsandratings" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{ color: 'inherit', textDecoration: 'none' }}
+              >
+                Comments
+              </a>
+            </li>
             <li style={styles.navItem}>Settings</li>
             <li style={styles.navItem}>Logs</li>
           </ul>

@@ -7,6 +7,13 @@ export const GetCommentAndrating = async (id: any) => {
     return rs.data;
 }
 
+export const GetAllCommentAndrating = async () => {
+    // console.log(id);
+    const rs = await axios.get(`/getallcommentandrating`);
+    //console.log(rs.data);
+    return rs.data;
+}
+
 export const PostCommentAndrating = async ( movieId: any, comment: any, rating: any, user: any) => {
     const rs = await axios.post(`/postcommentandrating`, {
         movieId: movieId,

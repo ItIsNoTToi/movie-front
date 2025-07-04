@@ -14,13 +14,13 @@ import SearchAll from "../pages/searchAll";
 import AdminCategoriesManagementPage from "../pages/Admin/categories_dashboard";
 import LISTMOVIE from "../pages/Listmovie";
 import WatchHistory from "../pages/watchhistory";
+import AdminCommentRating from "../pages/Admin/comment_dashboard";
 
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<Home />} />
     <Route path="/movie/:id" element={<MovieDetail />} />
     <Route path="/movie/:id/:episode" element={<Watch />} />
-    <Route path="/profile" element={<ProfilePage />} />
     <Route path="/searchAll" element={<SearchAll />} />
     <Route path="/List-movie" element={<LISTMOVIE/>} />
     <Route path="/top-movie" element={<></>} />
@@ -39,6 +39,8 @@ export const AdminRoutes = () => (
     <Route index element={<Dashboard />} />
     <Route path="categories" element={<AdminCategoriesManagementPage />} />
     <Route path="movies" element={<AdminMovieManagementPage />} />
+    <Route path="commentsandratings" element={<AdminCommentRating/>} />
+    <Route path="*" element={<NotFoundPage />} />
   </Route>
 );
 
@@ -46,6 +48,8 @@ export const AccountRoutes = () => (
   <>
     <Route path="/login" element={<LoginPage />} />
     <Route path="/register" element={<RegisterPage />} />
+    <Route path="/profile" element={<ProfilePage />} />
+    <Route path="*" element={<NotFoundPage />} />
   </>
 );
 
